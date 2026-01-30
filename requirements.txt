@@ -114,3 +114,4 @@ toolz==0.12.1
 zict==3.0.0
 fsspec==2024.2.0
 psutil==5.9.8
+seaborn==0.13.2
