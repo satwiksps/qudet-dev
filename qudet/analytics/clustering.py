@@ -37,7 +37,7 @@ class QuantumKMeans(BaseQuantumEstimator, ClusterMixin):
         sv2 = Statevector.from_instruction(qc2)
         
         overlap = np.abs(sv1.inner(sv2))**2
-        return np.sqrt(2 - 2 * overlap)
+        return np.sqrt(np.maximum(0, 2 - 2 * overlap))
 
     def fit(self, X, y=None):
         indices = np.random.choice(len(X), self.n_clusters, replace=False)
