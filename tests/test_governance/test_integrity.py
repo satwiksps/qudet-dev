@@ -3,9 +3,9 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.governance.integrity import DataIntegrityCheck
-from qdet.encoders.statevector import StatevectorEncoder
-from qdet.encoders.rotation import RotationEncoder
+from qudet.governance.integrity import DataIntegrityCheck
+from qudet.encoders.statevector import StatevectorEncoder
+from qudet.encoders.rotation import RotationEncoder
 
 
 class TestDataIntegrityCheck:
@@ -33,7 +33,7 @@ class TestDataIntegrityCheck:
         
     def test_verify_angle_encoding(self):
         """Test integrity check on IQP encoding."""
-        from qdet.encoders.iqp import IQPEncoder
+        from qudet.encoders.iqp import IQPEncoder
         encoder = IQPEncoder(n_qubits=2, reps=1)
         data = np.array([0.5, 0.3])
         
@@ -71,7 +71,7 @@ class TestDataIntegrityCheck:
         
     def test_compute_encoding_fidelity_angle(self):
         """Test fidelity computation for IQP encoding."""
-        from qdet.encoders.iqp import IQPEncoder
+        from qudet.encoders.iqp import IQPEncoder
         encoder = IQPEncoder(n_qubits=2, reps=1)
         data = np.array([0.5, 0.3])
         

@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.connectors.utilities import (
+from qudet.connectors.utilities import (
     DataConnectorFactory,
     DataBatchProcessor,
     DataFormatConverter,

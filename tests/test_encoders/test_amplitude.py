@@ -7,7 +7,7 @@ Tests amplitude, density matrix, basis change, and feature map encoders.
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.encoders.amplitude import (
+from qudet.encoders.amplitude import (
     AmplitudeEncoder,
     DensityMatrixEncoder,
     BasisChangeEncoder,

@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.connectors import QuantumDataLoader
+from qudet.connectors import QuantumDataLoader
 
 
 def test_loader_batching():

@@ -1,7 +1,7 @@
 # File: tests/test_orchestration/test_backend.py
 
 import pytest
-from qdet.compute.backend import BackendManager
+from qudet.compute.backend import BackendManager
 
 
 class TestBackendManager:

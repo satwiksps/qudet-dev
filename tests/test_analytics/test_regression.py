@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from qdet.analytics.regression import QuantumKernelRegressor
+from qudet.analytics.regression import QuantumKernelRegressor
 
 
 class TestQuantumKernelRegressor:

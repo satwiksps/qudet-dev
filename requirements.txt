@@ -1,3 +1,7 @@
+# QuDET - Quantum Data Engineering Toolkit - Production Dependencies
+# Tested & Compatible: Python 3.10, 3.11, 3.12
+# Updated: January 2026
+
 # Core Quantum Stack
 qiskit==1.0.2
 qiskit-aer==0.14.0.1

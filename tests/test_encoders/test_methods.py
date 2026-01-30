@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.encoders import RotationEncoder, StatevectorEncoder
+from qudet.encoders import RotationEncoder, StatevectorEncoder
 
 
 class TestRotationEncoder:

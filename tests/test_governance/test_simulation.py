@@ -1,7 +1,7 @@
 """Tests for Noise Profiler"""
 
 import pytest
-from qdet.governance.simulation import NoiseSimulator
+from qudet.governance.simulation import NoiseSimulator
 
 
 class TestNoiseSimulator:

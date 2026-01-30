@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.transforms.coresets import CoresetReducer
+from qudet.transforms.coresets import CoresetReducer
 
 def test_coreset_reduction_shape():
     """Test if the reducer actually reduces the data size."""

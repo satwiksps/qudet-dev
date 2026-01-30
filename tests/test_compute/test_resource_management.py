@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.compute.resource_management import (
+from qudet.compute.resource_management import (
     QuantumResourceAllocator,
     QuantumPriorityScheduler,
     QuantumCostEstimator

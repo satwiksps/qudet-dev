@@ -1,5 +1,5 @@
 """
-Test suite for Quantum Parquet Loader (qdet.connectors.parquet)
+Test suite for Quantum Parquet Loader (qudet.connectors.parquet)
 """
 
 import pytest
@@ -44,7 +44,7 @@ class TestQuantumParquetLoader:
     
     def test_initialization(self, sample_parquet_file):
         """Test loader initialization."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         loader = QuantumParquetLoader(sample_parquet_file, batch_size=25)
         
@@ -54,14 +54,14 @@ class TestQuantumParquetLoader:
     
     def test_initialization_invalid_file(self):
         """Test error on invalid file path."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         with pytest.raises(ValueError, match="Could not open"):
             QuantumParquetLoader('/nonexistent/file.parquet')
     
     def test_get_metadata(self, sample_parquet_file):
         """Test metadata retrieval."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         loader = QuantumParquetLoader(sample_parquet_file)
         metadata = loader.get_metadata()
@@ -77,7 +77,7 @@ class TestQuantumParquetLoader:
     
     def test_get_schema(self, sample_parquet_file):
         """Test schema retrieval."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         loader = QuantumParquetLoader(sample_parquet_file)
         schema = loader.get_schema()
@@ -89,7 +89,7 @@ class TestQuantumParquetLoader:
     
     def test_read_sample(self, sample_parquet_file):
         """Test reading sample rows."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         loader = QuantumParquetLoader(sample_parquet_file)
         sample = loader.read_sample(n_rows=5)
@@ -100,7 +100,7 @@ class TestQuantumParquetLoader:
     
     def test_iteration(self, sample_parquet_file):
         """Test iteration through batches."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         loader = QuantumParquetLoader(sample_parquet_file, batch_size=25)
         
@@ -120,7 +120,7 @@ class TestQuantumParquetLoader:
     
     def test_context_manager(self, sample_parquet_file):
         """Test context manager usage."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         with QuantumParquetLoader(sample_parquet_file) as loader:
             assert loader is not None
@@ -128,7 +128,7 @@ class TestQuantumParquetLoader:
     
     def test_encoder_type_parameter(self, sample_parquet_file):
         """Test different encoder types."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         for encoder_type in ['angle', 'amplitude', 'iqp']:
             loader = QuantumParquetLoader(
@@ -144,7 +144,7 @@ class TestQuantumParquetLoaderWithoutDependency:
     @pytest.mark.skipif(HAS_PARQUET, reason="PyArrow is installed")
     def test_initialization_without_parquet(self):
         """Test error when PyArrow not available."""
-        from qdet.connectors.parquet import QuantumParquetLoader
+        from qudet.connectors.parquet import QuantumParquetLoader
         
         with pytest.raises(ImportError, match="PyArrow not installed"):
             QuantumParquetLoader('/some/file.parquet')

@@ -3,7 +3,7 @@
 import pytest
 import pandas as pd
 from unittest.mock import Mock, MagicMock
-from qdet.connectors.sql import QuantumSQLLoader
+from qudet.connectors.sql import QuantumSQLLoader
 
 
 class TestQuantumSQLLoader:
@@ -13,7 +13,7 @@ class TestQuantumSQLLoader:
         """Test that missing SQLAlchemy raises ImportError."""
         # This would need to mock the import, which is complex
         # So we just test the error message
-        import qdet.io.sql as sql_module
+        import qudet.io.sql as sql_module
         
         if not sql_module.HAS_SQL:
             with pytest.raises(ImportError):

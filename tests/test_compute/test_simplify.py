@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.compute.simplify import CircuitOptimizer
+from qudet.compute.simplify import CircuitOptimizer
 
 
 class TestCircuitOptimizer:

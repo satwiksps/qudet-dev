@@ -4,7 +4,7 @@ Tests for Quantum Transformation Module (PCA)
 
 import numpy as np
 import pytest
-from qdet.transforms.pca import QuantumPCA
+from qudet.transforms.pca import QuantumPCA
 
 
 class TestQuantumPCA:

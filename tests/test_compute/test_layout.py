@@ -1,7 +1,7 @@
 """Tests for Hardware Layout Optimizer"""
 
 import pytest
-from qdet.compute.layout import HardwareLayoutSelector
+from qudet.compute.layout import HardwareLayoutSelector
 
 
 class MockBackend:

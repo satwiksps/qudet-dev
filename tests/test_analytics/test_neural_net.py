@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.analytics.neural_net import QuantumNeuralNetwork, QuantumTransferLearning
+from qudet.analytics.neural_net import QuantumNeuralNetwork, QuantumTransferLearning
 
 
 class TestQuantumNeuralNetwork:

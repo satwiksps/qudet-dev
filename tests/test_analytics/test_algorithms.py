@@ -3,7 +3,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from qdet.analytics import QuantumFeatureSelector, QuantumKMeans
+from qudet.analytics import QuantumFeatureSelector, QuantumKMeans
 
 
 def test_feature_selector_output_shape():

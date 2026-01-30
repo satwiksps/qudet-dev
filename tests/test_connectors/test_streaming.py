@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.connectors.streaming import (
+from qudet.connectors.streaming import (
     StreamingDataBuffer,
     DataStreamIterator,
     DataValidator,

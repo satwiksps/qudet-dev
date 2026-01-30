@@ -5,7 +5,7 @@ Tests access control, encryption, and security monitoring.
 """
 
 import pytest
-from qdet.governance.security import (
+from qudet.governance.security import (
     SecureAccessControl,
     EncryptionManager,
     SecurityMonitor,

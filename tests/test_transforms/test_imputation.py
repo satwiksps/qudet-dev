@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from qdet.transforms.imputation import QuantumImputer
+from qudet.transforms.imputation import QuantumImputer
 
 
 class TestQuantumImputer:

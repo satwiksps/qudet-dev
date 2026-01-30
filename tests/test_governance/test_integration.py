@@ -3,9 +3,9 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.transforms import CoresetReducer
-from qdet.encoders import RotationEncoder
-from qdet.analytics import QuantumFeatureSelector
+from qudet.transforms import CoresetReducer
+from qudet.encoders import RotationEncoder
+from qudet.analytics import QuantumFeatureSelector
 
 def test_full_pipeline_execution():
     """

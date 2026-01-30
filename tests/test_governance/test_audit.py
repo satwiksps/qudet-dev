@@ -8,7 +8,7 @@ import pytest
 import json
 import tempfile
 from datetime import datetime, timedelta
-from qdet.governance.audit import (
+from qudet.governance.audit import (
     AuditLogger,
     ComplianceChecker,
     DataGovernance,

@@ -1,29 +1,6 @@
+# `QuDET`: Quantum Data Engineering Toolkit
 
-<div align="center">
-  <h1>QDET: Quantum Data Engineering Toolkit</h1>
-  <p>
-    <strong>A Production-Ready Library for Hybrid Quantum-Classical Data Engineering</strong>
-  </p>
-  
-  <p>
-    <a href="https://www.python.org/">
-      <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue" alt="Python Version">
-    </a>
-    <a href="LICENSE">
-      <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
-    </a>
-    <a href="https://github.com/meow/quantum-data-engineering/actions">
-      <img src="https://img.shields.io/badge/build-passing-brightgreen" alt="Build Status">
-    </a>
-    <a href="https://black.readthedocs.io/en/stable/">
-      <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code Style">
-    </a>
-  </p>
-</div>
-
----
-
-**QDET** is an enterprise-grade Python library designed to bridge the gap between classical data engineering and quantum machine learning. It provides a robust, modular framework for building hybrid workflows, enabling researchers and engineers to integrate quantum algorithms into production pipelines without deep quantum physics expertise.
+**QuDET** is an enterprise-grade Python library designed to bridge the gap between classical data engineering and quantum machine learning. It provides a robust, modular framework for building hybrid workflows, enabling researchers and engineers to integrate quantum algorithms into production pipelines without deep quantum physics expertise.
 
 ## Table of Contents
 
@@ -41,7 +18,7 @@
 
 ## Core Modules
 
-QDET is built around six specialized modules that handle every stage of the quantum data lifecycle, from ingestion to governance.
+QuDET is built around six specialized modules that handle every stage of the quantum data lifecycle, from ingestion to governance.
 
 ### 1. Connectors
 **The Bridge to Data Sources**
@@ -65,7 +42,7 @@ Managing quantum hardware interactions is complex. The Compute layer abstracts t
 
 ### 6. Governance
 **Safety, Cost, & Reliability**
-Unique to QDET, this module addresses the operational challenges of "QuantumOps". It includes tools for:
+Unique to QuDET, this module addresses the operational challenges of "QuantumOps". It includes tools for:
 *   **Drift Detection:** Monitoring if the data distribution shifts using quantum kernels.
 *   **Cost Estimation:** Predicting the financial cost of running jobs on QPU providers.
 *   **Integrity Checks:** Verifying that data wasn't corrupted during the encoding process.
@@ -83,23 +60,33 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-QDET is designed to be intuitive. Here is a minimal example setting up a simple pipeline:
+QuDET is designed to be intuitive. Here is a minimal example setting up a simple pipeline:
 
 ```python
-from qdet.connectors import QuantumDataLoader
-from qdet.transforms import QuantumPCA
-from qdet.encoders import AngleEncoder
-from qdet.analytics import QuantumSVC
+from qudet.connectors import QuantumDataLoader
+from qudet.transforms import QuantumPCA
+from qudet.encoders import AngleEncoder
+from qudet.analytics import QuantumSVC
+from qudet.compute import BackendManager
+from qudet.governance import QuantumDriftDetector
 
 # 1. Pipeline Definition
-# Load -> Reduce -> Encode -> Classify
+# Load -> Check -> Reduce -> Encode -> Classify
 loader = QuantumDataLoader()
+drift_detector = QuantumDriftDetector()
 pca = QuantumPCA(n_components=4)
 encoder = AngleEncoder(n_qubits=4)
-classifier = QuantumSVC(n_qubits=4)
+
+# Get backend from Compute module
+backend = BackendManager.get_backend("simulator")
+classifier = QuantumSVC(n_qubits=4) # Uses simulator by default
 
 # 2. Execution Flow
 data = loader.load_csv("data.csv")
+
+# Governance: Check for data drift before processing
+drift_detector.fit_reference(data) 
+
 reduced_data = pca.fit_transform(data)
 classifier.fit(reduced_data, labels)
 

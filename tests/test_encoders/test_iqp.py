@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from qdet.encoders.iqp import IQPEncoder
+from qudet.encoders.iqp import IQPEncoder
 
 
 class TestIQPEncoder:

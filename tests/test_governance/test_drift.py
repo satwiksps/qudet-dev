@@ -1,10 +1,10 @@
 """
-Test suite for Quantum Drift Detector (qdet.validation.drift)
+Test suite for Quantum Drift Detector (qudet.validation.drift)
 """
 
 import pytest
 import numpy as np
-from qdet.governance.drift import QuantumDriftDetector
+from qudet.governance.drift import QuantumDriftDetector
 
 
 class MockQuantumKernelComputer:

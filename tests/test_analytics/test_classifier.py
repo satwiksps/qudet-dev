@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from qdet.analytics.classifier import QuantumSVC
+from qudet.analytics.classifier import QuantumSVC
 
 
 class TestQuantumSVC:

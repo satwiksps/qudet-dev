@@ -7,7 +7,7 @@ Tests QuantumNormalizer, RangeNormalizer, DecimalScaler, LogTransformer, PowerTr
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.transforms.normalization import (
+from qudet.transforms.normalization import (
     QuantumNormalizer,
     RangeNormalizer,
     DecimalScaler,

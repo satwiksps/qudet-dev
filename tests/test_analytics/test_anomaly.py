@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from qdet.analytics.anomaly import QuantumKernelAnomalyDetector
+from qudet.analytics.anomaly import QuantumKernelAnomalyDetector
 
 def test_anomaly_detection_flow():
     """

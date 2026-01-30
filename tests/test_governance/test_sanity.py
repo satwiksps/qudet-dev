@@ -2,7 +2,7 @@
 
 import pytest
 from qiskit import QuantumCircuit
-from qdet.governance.cost import ResourceEstimator
+from qudet.governance.cost import ResourceEstimator
 
 
 class TestResourceEstimator:

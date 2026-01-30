@@ -7,7 +7,7 @@ Tests composite, layered, data reuse, adaptive, and hierarchical encoders.
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.encoders.composite import (
+from qudet.encoders.composite import (
     CompositeEncoder,
     LayeredEncoder,
     DataReuseEncoder,

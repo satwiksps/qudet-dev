@@ -3,8 +3,8 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.compute.distributed import DistributedQuantumProcessor
-from qdet.encoders.statevector import StatevectorEncoder
+from qudet.compute.distributed import DistributedQuantumProcessor
+from qudet.encoders.statevector import StatevectorEncoder
 
 
 class TestDistributedQuantumProcessor:
@@ -43,7 +43,7 @@ class TestDistributedQuantumProcessor:
         
     def test_process_numpy_array(self):
         """Test processing numpy array input."""
-        from qdet.encoders.iqp import IQPEncoder
+        from qudet.encoders.iqp import IQPEncoder
         encoder = IQPEncoder(n_qubits=2, reps=1)
         processor = DistributedQuantumProcessor(encoder=encoder, n_workers=2)
         

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.compute.error_mitigation import (
+from qudet.compute.error_mitigation import (
     QuantumErrorMitigation,
     QuantumNoiseModel,
     QuantumCalibrationalAnalyzer

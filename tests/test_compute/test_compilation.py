@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.compute.compilation import (
+from qudet.compute.compilation import (
     QuantumCircuitCompiler,
     QuantumCircuitOptimizer,
     QuantumNativeGateTranspiler

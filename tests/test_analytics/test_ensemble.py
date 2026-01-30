@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.analytics.ensemble import QuantumEnsemble, QuantumDataAugmentation, QuantumMetaLearner
+from qudet.analytics.ensemble import QuantumEnsemble, QuantumDataAugmentation, QuantumMetaLearner
 
 
 class TestQuantumEnsemble:

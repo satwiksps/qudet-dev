@@ -1,10 +1,10 @@
 """
-Test suite for Quantum Autoencoder (qdet.analytics.autoencoder)
+Test suite for Quantum Autoencoder (qudet.analytics.autoencoder)
 """
 
 import pytest
 import numpy as np
-from qdet.analytics.autoencoder import QuantumAutoencoder
+from qudet.analytics.autoencoder import QuantumAutoencoder
 
 
 class TestQuantumAutoencoder:

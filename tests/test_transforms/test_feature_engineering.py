@@ -7,7 +7,7 @@ Tests FeatureScaler, FeatureSelector, OutlierRemover, DataBalancer.
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.transforms.feature_engineering import (
+from qudet.transforms.feature_engineering import (
     FeatureScaler,
     FeatureSelector,
     OutlierRemover,

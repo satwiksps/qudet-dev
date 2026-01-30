@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.analytics.vqe import VariationalQuantumEigensolver, QAOA
+from qudet.analytics.vqe import VariationalQuantumEigensolver, QAOA
 
 
 class TestVariationalQuantumEigensolver:

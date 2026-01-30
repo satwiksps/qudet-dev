@@ -5,7 +5,7 @@ import json
 import tempfile
 import pytest
 from qiskit import QuantumCircuit
-from qdet.connectors.serialization import QuantumSerializer
+from qudet.connectors.serialization import QuantumSerializer
 
 
 class TestQuantumSerializer:

@@ -2,7 +2,7 @@
 
 import pytest
 from qiskit import QuantumCircuit
-from qdet.governance.privacy import QuantumDifferentialPrivacy
+from qudet.governance.privacy import QuantumDifferentialPrivacy
 
 
 class TestQuantumDifferentialPrivacy:

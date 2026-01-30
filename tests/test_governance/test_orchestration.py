@@ -8,7 +8,7 @@ import pytest
 import json
 import tempfile
 from datetime import datetime, timedelta
-from qdet.governance.orchestration import (
+from qudet.governance.orchestration import (
     Workflow,
     ResourceScheduler,
     Task,

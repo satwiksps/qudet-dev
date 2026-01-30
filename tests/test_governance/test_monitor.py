@@ -1,12 +1,12 @@
 """
-Test suite for Job Monitor (qdet.utils.monitor)
+Test suite for Job Monitor (qudet.utils.monitor)
 """
 
 import pytest
 import time
 from io import StringIO
 import sys
-from qdet.governance.monitor import JobMonitor
+from qudet.governance.monitor import JobMonitor
 
 
 class TestJobMonitor:

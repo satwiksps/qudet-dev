@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 import pytest
-from qdet.transforms.auto import AutoReducer
+from qudet.transforms.auto import AutoReducer
 
 
 class TestAutoReducer:

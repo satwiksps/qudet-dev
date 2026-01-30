@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from qdet.analytics.timeseries import (
+from qudet.analytics.timeseries import (
     QuantumTimeSeriesPredictor,
     QuantumOutlierDetection,
     QuantumDimensionalityReduction

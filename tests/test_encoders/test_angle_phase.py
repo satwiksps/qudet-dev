@@ -7,7 +7,7 @@ Tests angle, phase, hybrid, multi-axis, and parametric encoders.
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
-from qdet.encoders.angle_phase import (
+from qudet.encoders.angle_phase import (
     AngleEncoder,
     PhaseEncoder,
     HybridAnglePhaseEncoder,

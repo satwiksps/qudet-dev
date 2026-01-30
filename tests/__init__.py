@@ -1,1 +1,1 @@
-"""Test suite for QDET."""
+"""Test suite for QuDET."""

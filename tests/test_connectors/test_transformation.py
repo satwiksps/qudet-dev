@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.connectors.transformation import (
+from qudet.connectors.transformation import (
     DataTransformer,
     DataMetadataTracker,
     DataQualityChecker,

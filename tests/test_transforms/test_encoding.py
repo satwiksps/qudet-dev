@@ -7,7 +7,7 @@ Tests CategoricalEncoder, TargetEncoder, FrequencyEncoder, BinningEncoder.
 import pytest
 import numpy as np
 import pandas as pd
-from qdet.transforms.encoding import (
+from qudet.transforms.encoding import (
     CategoricalEncoder,
     TargetEncoder,
     FrequencyEncoder,
