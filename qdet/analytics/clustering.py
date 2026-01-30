@@ -44,7 +44,7 @@ class QuantumKMeans(BaseQuantumEstimator, ClusterMixin):
         self.centroids_ = X.iloc[indices].values if hasattr(X, 'iloc') else X[indices]
         
         for iteration in range(self.max_iter):
-            print(f"--- ⚛️ Q-Means Iteration {iteration+1}/{self.max_iter} ---")
+            print(f"--- Q-Means Iteration {iteration+1}/{self.max_iter} ---")
             
             labels = []
             for row in X.values if hasattr(X, 'iloc') else X:

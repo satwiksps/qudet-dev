@@ -48,7 +48,7 @@ class CircuitOptimizer:
             CommutativeCancellation()
         ])
         
-        print(f"--- 🔧 Circuit Optimizer Initialized (Level {level}) ---")
+        print(f"--- Circuit Optimizer Initialized (Level {level}) ---")
 
     def optimize(self, circuit: QuantumCircuit) -> QuantumCircuit:
         """
@@ -91,9 +91,9 @@ class CircuitOptimizer:
         List[QuantumCircuit]
             List of optimized circuits (same order)
         """
-        print(f"--- 🔄 Optimizing batch of {len(circuits)} circuits ---")
+        print(f"--- Optimizing batch of {len(circuits)} circuits ---")
         optimized_circuits = [self.optimize(qc) for qc in circuits]
-        print(f"--- ✅ Batch optimization complete ---")
+        print(f"--- Batch optimization complete ---")
         return optimized_circuits
 
     def estimate_savings(self, original_circuit: QuantumCircuit, optimized_circuit: QuantumCircuit) -> dict:

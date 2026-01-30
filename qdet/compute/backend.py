@@ -43,7 +43,7 @@ class BackendManager:
         ImportError
             If requesting IBM backend but qiskit-ibm-runtime not installed
         """
-        print(f"--- 🔌 Connecting to Backend: {name} ---")
+        print(f"--- Connecting to Backend: {name} ---")
         
         if name == "simulator":
             return AerSimulator(method='statevector')
@@ -62,11 +62,11 @@ class BackendManager:
                 
             real_backend = service.backend(name)
             n_qubits = real_backend.num_qubits
-            print(f"   ✅ Connected to QPU: {real_backend.name} ({n_qubits} qubits)")
+            print(f"   Connected to QPU: {real_backend.name} ({n_qubits} qubits)")
             return real_backend
             
         except Exception as e:
-            print(f"   ❌ Connection Failed: {e}")
+            print(f"   Connection Failed: {e}")
             print("   -> Falling back to Simulator")
             return AerSimulator()
 

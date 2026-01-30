@@ -36,7 +36,7 @@ class QuantumJobOperator(BaseOperator):
         2. Runs the Quantum Estimator (fit/predict).
         3. Returns results as JSON string (for XComs).
         """
-        print(f"--- ⚛️ Starting Quantum Job on {self.backend} ---")
+        print(f"--- Starting Quantum Job on {self.backend} ---")
         
         import pandas as pd
         print(f"Loading data from {self.data_path}...")

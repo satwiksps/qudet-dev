@@ -132,7 +132,7 @@ class QuantumAutoencoder(BaseQuantumEstimator):
             )
         
         print(
-            f"⚛️  Training Quantum Autoencoder: {self.n_input} qubits → {self.n_latent} qubits"
+            f"Training Quantum Autoencoder: {self.n_input} qubits → {self.n_latent} qubits"
         )
         print(f"   • Compression ratio: {self.n_latent / self.n_input:.1%}")
         print(f"   • Trash qubits: {self.n_trash}")
@@ -174,7 +174,7 @@ class QuantumAutoencoder(BaseQuantumEstimator):
                 f"Expected {self.n_input} features, got {X.shape[1]}"
             )
         
-        print(f"🔄 Compressing {X.shape[0]} samples...")
+        print(f"Compressing {X.shape[0]} samples...")
         
         compressed_data = []
         encoder = RotationEncoder(self.n_input)
@@ -189,7 +189,7 @@ class QuantumAutoencoder(BaseQuantumEstimator):
             compressed_data.append(compressed_row)
         
         result = np.array(compressed_data)
-        print(f"✅ Compressed: {X.shape} → {result.shape}")
+        print(f"Compressed: {X.shape} → {result.shape}")
         
         return result
 
@@ -215,12 +215,12 @@ class QuantumAutoencoder(BaseQuantumEstimator):
                 f"Expected {self.n_latent} features, got {X_latent.shape[1]}"
             )
         
-        print(f"🔄 Decompressing {X_latent.shape[0]} samples...")
+        print(f"Decompressing {X_latent.shape[0]} samples...")
         
         padding = np.zeros((X_latent.shape[0], self.n_trash))
         reconstructed = np.hstack([X_latent, padding])
         
-        print(f"✅ Decompressed: {X_latent.shape} → {reconstructed.shape}")
+        print(f"Decompressed: {X_latent.shape} → {reconstructed.shape}")
         
         return reconstructed
 

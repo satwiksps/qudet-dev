@@ -83,7 +83,7 @@ class QuantumParquetLoader:
         self.batch_size = batch_size
         self.encoder_type = encoder_type
         
-        print(f"✅ Parquet file loaded: {filepath}")
+        print(f"Parquet file loaded: {filepath}")
         print(f"   • Row groups: {self.parquet_file.num_row_groups}")
         print(f"   • Total rows: {self.parquet_file.metadata.num_rows}")
         print(f"   • Columns: {self.parquet_file.metadata.num_columns}")
@@ -107,7 +107,7 @@ class QuantumParquetLoader:
         total_rows = 0
         
         for row_group_idx in range(self.parquet_file.num_row_groups):
-            print(f"\n📦 Processing row group {row_group_idx + 1}/{self.parquet_file.num_row_groups}...")
+            print(f"\nProcessing row group {row_group_idx + 1}/{self.parquet_file.num_row_groups}...")
             
             table_chunk = self.parquet_file.read_row_group(row_group_idx)
             df_chunk = table_chunk.to_pandas()
@@ -126,7 +126,7 @@ class QuantumParquetLoader:
                 
                 yield batch_data, batch_circuits
         
-        print(f"\n✅ Parquet loading complete!")
+        print(f"\nParquet loading complete!")
         print(f"   • Total batches: {total_batches}")
         print(f"   • Total rows processed: {total_rows}")
 

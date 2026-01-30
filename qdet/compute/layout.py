@@ -68,7 +68,7 @@ class HardwareLayoutSelector:
             best_qubits = sorted_qubits[:min(n_qubits, len(sorted_qubits))]
             
             avg_error = np.mean([readout_errors[q] for q in best_qubits])
-            print(f"--- 🎯 Selected Best Qubits: {best_qubits} (Avg Error: {avg_error:.4f}) ---")
+            print(f"--- Selected Best Qubits: {best_qubits} (Avg Error: {avg_error:.4f}) ---")
             
             return best_qubits
             

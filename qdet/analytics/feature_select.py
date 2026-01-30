@@ -23,7 +23,7 @@ class QuantumFeatureSelector(BaseQuantumEstimator):
         Finds the feature subset that maximizes correlation with y 
         while minimizing inter-feature correlation.
         """
-        print(f"--- ⚛️ Initializing optimization on {self.backend_name} ---")
+        print(f"--- Initializing optimization on {self.backend_name} ---")
         
         corr_matrix = X.corr().abs()
         target_corr = X.corrwith(y).abs()

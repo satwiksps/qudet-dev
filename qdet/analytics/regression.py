@@ -135,7 +135,7 @@ class QuantumKernelRegressor(BaseQuantumEstimator):
         self
             Fitted regressor instance
         """
-        print(f"--- ⚛️ Training Quantum Regressor on {len(X)} samples ---")
+        print(f"--- Training Quantum Regressor on {len(X)} samples ---")
         
         self.train_data_ = X.values if isinstance(X, pd.DataFrame) else X
         
@@ -145,7 +145,7 @@ class QuantumKernelRegressor(BaseQuantumEstimator):
         self.model.fit(kernel_matrix, y_values)
         
         self.is_fitted = True
-        print(f"   ✅ Training complete. Ready for predictions.")
+        print(f"   Training complete. Ready for predictions.")
         return self
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:

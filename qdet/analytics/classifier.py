@@ -100,7 +100,7 @@ class QuantumSVC(BaseQuantumEstimator):
         if len(np.unique(y)) != 2:
             raise ValueError("QuantumSVC supports binary classification only")
             
-        print(f"--- ⚛️ Training Quantum SVC on {len(X)} samples ---")
+        print(f"--- Training Quantum SVC on {len(X)} samples ---")
         self.train_data_ = X
         kernel_matrix = self._compute_kernel_matrix(X, X)
         self.svc_model.fit(kernel_matrix, y)

@@ -72,7 +72,7 @@ class JobMonitor:
         self.current = 0
         self.start_time = time.time()
         
-        print(f"🚀 {description} ({total_items} items)")
+        print(f"{description} ({total_items} items)")
 
     def update(self, n: int = 1) -> None:
         """
@@ -129,7 +129,7 @@ class JobMonitor:
         if self.current >= self.total:
             sys.stdout.write("\n")
             elapsed_total = time.time() - self.start_time
-            print(f"✅ Complete in {elapsed_total:.1f}s")
+            print(f"Complete in {elapsed_total:.1f}s")
 
     def reset(self) -> None:
         """
@@ -139,7 +139,7 @@ class JobMonitor:
         """
         self.current = 0
         self.start_time = time.time()
-        print(f"🔄 Progress reset")
+        print(f"Progress reset")
 
     def close(self) -> None:
         """

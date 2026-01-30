@@ -52,9 +52,9 @@ class DistributedQuantumProcessor:
         if HAS_DASK:
             self.cluster = LocalCluster(n_workers=n_workers, silence_logs=False)
             self.client = Client(self.cluster)
-            print(f"--- ⚡ Dask Cluster Started: {self.client.dashboard_link} ---")
+            print(f"--- Dask Cluster Started: {self.client.dashboard_link} ---")
         else:
-            print("--- ⚠️  Dask not installed. Running in serial mode. ---")
+            print("--- Dask not installed. Running in serial mode. ---")
 
     def process_large_dataset(self, data: Union[pd.DataFrame, "dd.DataFrame"]) -> List:
         """
@@ -71,14 +71,14 @@ class DistributedQuantumProcessor:
             List of encoded quantum circuits (one per row)
         """
         if not HAS_DASK:
-            print("--- ℹ️  Dask unavailable. Encoding serially ---")
+            print("--- Dask unavailable. Encoding serially ---")
             if isinstance(data, pd.DataFrame):
                 data_values = data.values
             else:
                 data_values = data
             return [self.encoder.encode(row) for row in data_values]
 
-        print(f"--- 🚀 Distributing {len(data)} rows to {self.n_workers} workers ---")
+        print(f"--- Distributing {len(data)} rows to {self.n_workers} workers ---")
         
         if isinstance(data, pd.DataFrame):
             dask_df = dd.from_pandas(data, npartitions=self.n_workers)
@@ -111,7 +111,7 @@ class DistributedQuantumProcessor:
         
         flat_list = [item for sublist in results if sublist for item in sublist]
         
-        print(f"--- ✅ Distributed Encoding Complete: {len(flat_list)} circuits ---")
+        print(f"--- Distributed Encoding Complete: {len(flat_list)} circuits ---")
         return flat_list
 
     def shutdown(self):
@@ -122,4 +122,4 @@ class DistributedQuantumProcessor:
         if self.client:
             self.client.close()
             self.cluster.close()
-            print("--- 🛑 Dask Cluster Shutdown ---")
+            print("--- Dask Cluster Shutdown ---")

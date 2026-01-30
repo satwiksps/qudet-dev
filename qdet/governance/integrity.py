@@ -177,7 +177,7 @@ class DataIntegrityCheck:
                 num_passed += 1
             except Exception as e:
                 num_failed += 1
-                print(f"  ❌ Sample {i} failed: {str(e)[:100]}")
+                print(f"  Sample {i} failed: {str(e)[:100]}")
         
-        print(f"--- ✅ Batch Verification: {num_passed}/{len(data_batch)} passed ---")
+        print(f"--- Batch Verification: {num_passed}/{len(data_batch)} passed ---")
         return num_passed, num_failed

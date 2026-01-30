@@ -39,9 +39,9 @@ class ResourceEstimator:
         Advises if the dataset is too big for current quantum tech.
         """
         if n_features > 127:
-            return "❌ INFEASIBLE: Too many features. Use RandomProjector first."
+            return "INFEASIBLE: Too many features. Use RandomProjector first."
         
         if n_samples > 10000:
-             return "⚠️ EXPENSIVE: >10k samples. Recommended to use CoresetReducer."
+             return "EXPENSIVE: >10k samples. Recommended to use CoresetReducer."
              
-        return "✅ FEASIBLE: Job fits within standard NISQ limits."
+        return "FEASIBLE: Job fits within standard NISQ limits."

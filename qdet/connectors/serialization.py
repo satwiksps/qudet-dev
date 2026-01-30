@@ -54,7 +54,7 @@ class QuantumSerializer:
             
         with open(filepath, 'w') as f:
             json.dump(data, f, indent=2)
-        print(f"✅ Saved {len(circuits)} circuits to {filepath}")
+        print(f"Saved {len(circuits)} circuits to {filepath}")
 
     @staticmethod
     def load_circuits(filepath: str) -> List[QuantumCircuit]:
@@ -81,7 +81,7 @@ class QuantumSerializer:
                 
             circuits.append(qc)
             
-        print(f"✅ Loaded {len(circuits)} circuits from {filepath}")
+        print(f"Loaded {len(circuits)} circuits from {filepath}")
         return circuits
 
     @staticmethod
@@ -101,7 +101,7 @@ class QuantumSerializer:
         """
         with open(filepath, 'wb') as f:
             pickle.dump(model, f)
-        print(f"✅ Saved model to {filepath}")
+        print(f"Saved model to {filepath}")
             
     @staticmethod
     def load_model(filepath: str):
@@ -116,7 +116,7 @@ class QuantumSerializer:
         """
         with open(filepath, 'rb') as f:
             model = pickle.load(f)
-        print(f"✅ Loaded model from {filepath}")
+        print(f"Loaded model from {filepath}")
         return model
 
     @staticmethod
@@ -135,7 +135,7 @@ class QuantumSerializer:
             
         with open(filepath, 'w') as f:
             f.write(qasm_str)
-        print(f"✅ Exported circuit to {filepath}")
+        print(f"Exported circuit to {filepath}")
 
     @staticmethod
     def import_circuit_qasm(filepath: str) -> QuantumCircuit:
@@ -152,5 +152,5 @@ class QuantumSerializer:
             qasm_str = f.read()
             
         circuit = loads(qasm_str)
-        print(f"✅ Imported circuit from {filepath}")
+        print(f"Imported circuit from {filepath}")
         return circuit

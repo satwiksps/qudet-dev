@@ -40,7 +40,7 @@ class QuantumDriftDetector:
     >>> detector.fit_reference(X_train)
     >>> result = detector.detect_drift(X_current)
     >>> if result['drift_detected']:
-    ...     print("⚠️  Data drift detected! Retrain model!")
+    ...     print("Data drift detected! Retrain model!")
     ...     print(f"MMD score: {result['mmd_score']:.4f}")
     
     References
@@ -90,7 +90,7 @@ class QuantumDriftDetector:
             raise ValueError(f"Expected 2D array, got shape {X.shape}")
         
         self.reference_data_ = X
-        print(f"✅ Reference data stored: {X.shape}")
+        print(f"Reference data stored: {X.shape}")
         print(f"   • Samples: {X.shape[0]}")
         print(f"   • Features: {X.shape[1]}")
         
@@ -120,7 +120,7 @@ class QuantumDriftDetector:
             - "drift_detected" (bool): True if MMD > threshold
             - "mmd_score" (float): Computed MMD value
             - "threshold" (float): Decision threshold
-            - "status" (str): "🔴 DRIFT" or "🟢 STABLE"
+            - "status" (str): "DRIFT" or "STABLE"
             
         Raises
         ------
@@ -145,7 +145,7 @@ class QuantumDriftDetector:
                 f"new data has {X_new.shape[1]}"
             )
         
-        print(f"\n🔍 Calculating Quantum Drift (MMD)...")
+        print(f"\nCalculating Quantum Drift (MMD)...")
         print(f"   • Reference samples: {self.reference_data_.shape[0]}")
         print(f"   • New samples: {X_new.shape[0]}")
         
@@ -180,12 +180,12 @@ class QuantumDriftDetector:
             "drift_detected": bool(is_drift),
             "mmd_score": float(round(mmd_score, 4)),
             "threshold": self.threshold,
-            "status": "🔴 DRIFT DETECTED" if is_drift else "🟢 STABLE",
+            "status": "DRIFT DETECTED" if is_drift else "STABLE",
             "reference_size": self.reference_data_.shape[0],
             "new_size": X_new.shape[0]
         }
         
-        print(f"\n📊 Results:")
+        print(f"\nResults:")
         print(f"   • MMD Score: {result['mmd_score']:.4f}")
         print(f"   • Threshold: {result['threshold']:.4f}")
         print(f"   • Status: {result['status']}")
@@ -209,7 +209,7 @@ class QuantumDriftDetector:
             raise ValueError(f"Threshold must be non-negative, got {threshold}")
         
         self.threshold = threshold
-        print(f"✅ Threshold updated to {threshold:.4f}")
+        print(f"Threshold updated to {threshold:.4f}")
         
         return self
 

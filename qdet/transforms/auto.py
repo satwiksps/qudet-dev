@@ -68,7 +68,7 @@ class AutoReducer(BaseReducer):
         else:
             n_rows, n_cols = X.shape
 
-        print(f"--- 🤖 AutoReducer analyzing shape ({n_rows}, {n_cols}) ---")
+        print(f"--- AutoReducer analyzing shape ({n_rows}, {n_cols}) ---")
 
         if n_cols > self.target_qubits:
             print(
