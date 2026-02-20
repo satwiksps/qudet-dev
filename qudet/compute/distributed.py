@@ -1,8 +1,19 @@
+"""
+Distributed quantum circuit encoding using Dask.
+
+Splits large datasets into partitions and encodes them in parallel across
+CPU workers before batch submission to a quantum backend.
+"""
+
+import logging
+from typing import List, Union
 
 import numpy as np
 import pandas as pd
-from typing import List, Union
+
 from qudet.core.base import BaseEncoder
+
+logger = logging.getLogger(__name__)
 
 HAS_DASK = False
 try:
@@ -16,110 +27,87 @@ except Exception:
 
 
 class DistributedQuantumProcessor:
-    """
-    Manages parallel execution of Quantum Encoding using Dask.
-    
-    Splits massive datasets into chunks, encodes them on parallel CPUs,
-    and prepares them for batch submission to the QPU.
-    
-    Philosophy:
-    "Large Scale" means you cannot process 1 million rows in a simple loop.
-    This class distributes encoding across multiple CPUs before queuing
-    for the Quantum Processing Unit.
-    
+    """Manage parallel quantum encoding of large datasets using Dask.
+
+    Splits massive datasets into chunks, encodes them on parallel CPU workers,
+    and prepares them for batch submission to the QPU. Falls back to serial
+    processing when Dask is not available.
+
     Example:
-        >>> processor = DistributedQuantumProcessor(encoder=StatevectorEncoder(4), n_workers=4)
+        >>> processor = DistributedQuantumProcessor(
+        ...     encoder=StatevectorEncoder(4), n_workers=4
+        ... )
         >>> circuits = processor.process_large_dataset(large_df)
         >>> processor.shutdown()
     """
-    
-    def __init__(self, encoder: BaseEncoder, n_workers: int = 4):
-        """
-        Initialize Distributed Quantum Processor.
-        
-        Parameters
-        ----------
-        encoder : BaseEncoder
-            Quantum encoder to apply to each row
-        n_workers : int
-            Number of parallel worker processes (CPU cores to use)
+
+    def __init__(self, encoder: BaseEncoder, n_workers: int = 4) -> None:
+        """Initialize the distributed quantum processor.
+
+        Args:
+            encoder: Quantum encoder to apply to each data row.
+            n_workers: Number of parallel Dask worker processes.
         """
         self.encoder = encoder
         self.n_workers = n_workers
         self.client = None
         self.cluster = None
-        
+
         if HAS_DASK:
             self.cluster = LocalCluster(n_workers=n_workers, silence_logs=False)
             self.client = Client(self.cluster)
-            print(f"--- Dask Cluster Started: {self.client.dashboard_link} ---")
+            logger.info("Dask cluster started: %s", self.client.dashboard_link)
         else:
-            print("--- Dask not installed. Running in serial mode. ---")
+            logger.warning("Dask not installed. Running in serial mode.")
 
     def process_large_dataset(self, data: Union[pd.DataFrame, "dd.DataFrame"]) -> List:
-        """
-        Parallelizes the encoding step across the cluster.
-        
-        Parameters
-        ----------
-        data : pd.DataFrame or dd.DataFrame
-            Input data to encode (rows are samples)
-            
-        Returns
-        -------
-        List
-            List of encoded quantum circuits (one per row)
+        """Encode a large dataset in parallel across the Dask cluster.
+
+        Args:
+            data: Input data to encode. Rows are treated as individual samples.
+                Accepts a pandas or Dask DataFrame.
+
+        Returns:
+            List of encoded quantum circuits (one per row).
         """
         if not HAS_DASK:
-            print("--- Dask unavailable. Encoding serially ---")
+            logger.info("Dask unavailable — encoding serially")
             if isinstance(data, pd.DataFrame):
                 data_values = data.values
             else:
                 data_values = data
             return [self.encoder.encode(row) for row in data_values]
 
-        print(f"--- Distributing {len(data)} rows to {self.n_workers} workers ---")
-        
+        logger.info("Distributing %d rows to %d workers", len(data), self.n_workers)
+
         if isinstance(data, pd.DataFrame):
             dask_df = dd.from_pandas(data, npartitions=self.n_workers)
         else:
             dask_df = data
 
         def encode_partition(df_partition):
-            """
-            Encodes a partition of data (called on each worker).
-            
-            Parameters
-            ----------
-            df_partition : pd.DataFrame
-                A chunk of the data to process
-                
-            Returns
-            -------
-            List
-                List of encoded quantum circuits
-            """
+            """Encode a single partition of data (runs on a worker)."""
             circuits = []
             for row in df_partition.values:
                 circuits.append(self.encoder.encode(row))
             return circuits
 
         results = dask_df.map_partitions(
-            encode_partition, 
+            encode_partition,
             meta=('circuits', 'object')
         ).compute()
-        
+
         flat_list = [item for sublist in results if sublist for item in sublist]
-        
-        print(f"--- Distributed Encoding Complete: {len(flat_list)} circuits ---")
+
+        logger.info("Distributed encoding complete: %d circuits", len(flat_list))
         return flat_list
 
-    def shutdown(self):
-        """
-        Gracefully shutdown the Dask cluster.
-        Should be called when done processing.
+    def shutdown(self) -> None:
+        """Gracefully shut down the Dask cluster.
+
+        Should be called when processing is complete to free resources.
         """
         if self.client:
             self.client.close()
             self.cluster.close()
-            print("--- Dask Cluster Shutdown ---")
+            logger.info("Dask cluster shut down")

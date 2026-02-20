@@ -1,4 +1,11 @@
-from . import airflow_ops
+"""
+Quantum compute infrastructure module.
+
+Provides backend management, circuit optimization, compilation, distributed
+processing, error mitigation, hardware layout selection, and resource
+management utilities for quantum computing workflows.
+"""
+
 from . import backend
 from . import distributed
 from . import layout
@@ -27,7 +34,6 @@ from .resource_management import (
 )
 
 __all__ = [
-    "airflow_ops",
     "backend",
     "distributed",
     "layout",
