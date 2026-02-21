@@ -1,3 +1,19 @@
+"""
+Connectors module for QuDET.
+
+Provides data loading, streaming, transformation, serialization, and utility
+classes for bridging classical data sources with quantum computing pipelines.
+
+Submodules:
+    loader: Core batch data loader with quantum encoding.
+    sql: SQL database connector with chunked iteration.
+    parquet: Apache Parquet file connector with row-group streaming.
+    serialization: QASM / JSON / pickle persistence for circuits and models.
+    streaming: Streaming buffers, iterators, validators, caches, and aggregators.
+    transformation: Data transformations, metadata tracking, quality checks, profiling.
+    utilities: Factory, batch processing, format conversion, splitting, sampling.
+"""
+
 from . import loader
 from . import sql
 from . import parquet

@@ -1,156 +1,158 @@
 """
 Quantum Circuit and Model Serialization.
 
-Data pipelines crash. You need to save your work. This module saves 
-Quantum Circuits (which are objects) into QASM (Quantum Assembly) or JSON 
+Data pipelines crash. You need to save your work. This module saves
+Quantum Circuits (which are objects) into QASM (Quantum Assembly) or JSON
 so they can be stored in a database or S3.
 """
 
 import json
+import logging
 import pickle
-from typing import List, Union
+from typing import List
+
 from qiskit import QuantumCircuit
 from qiskit.qasm2 import dumps, loads
 
+logger = logging.getLogger(__name__)
+
 
 class QuantumSerializer:
+    """Handles saving and loading of QuDET artifacts.
+
+    Supported formats:
+
+    * **QASM** — Quantum Assembly Language, the standard text format for
+      quantum circuits.
+    * **JSON** — Metadata and circuit descriptions stored as a JSON list
+      of QASM strings.
+    * **Pickle** — Full Python objects (models, trained instances).
+
+    This enables persistence of quantum computations for reproducibility
+    and pipeline recovery.
     """
-    Handles saving/loading of QuDET artifacts.
-    
-    Supports:
-    - QASM (Quantum Assembly Language): Standard format for quantum circuits
-    - JSON: Metadata and circuit descriptions
-    - Pickle: Full Python objects (models, trained instances)
-    
-    This enables persistence of quantum computations for 
-    reproducibility and pipeline recovery.
-    """
-    
+
     @staticmethod
     def save_circuits(circuits: List[QuantumCircuit], filepath: str) -> None:
-        """
-        Saves a list of circuits to a file.
-        Format: JSON list of QASM strings.
-        
+        """Save a list of circuits to a JSON file of QASM strings.
+
         Args:
-            circuits (List[QuantumCircuit]): List of quantum circuits to save
-            filepath (str): Path to output JSON file
-            
-        Returns:
-            None
+            circuits: List of quantum circuits to save.
+            filepath: Path to output JSON file.
+
+        Raises:
+            TypeError: If *circuits* is not a list of ``QuantumCircuit``.
         """
+        if not isinstance(circuits, list):
+            raise TypeError("'circuits' must be a list of QuantumCircuit.")
+
         data = []
         for i, qc in enumerate(circuits):
             qasm_str = dumps(qc)
-                
             record = {
                 "id": i,
                 "n_qubits": qc.num_qubits,
                 "n_clbits": qc.num_clbits,
                 "name": qc.name,
-                "qasm": qasm_str
+                "qasm": qasm_str,
             }
             data.append(record)
-            
-        with open(filepath, 'w') as f:
+
+        with open(filepath, "w") as f:
             json.dump(data, f, indent=2)
-        print(f"Saved {len(circuits)} circuits to {filepath}")
+        logger.info("Saved %d circuits to %s", len(circuits), filepath)
 
     @staticmethod
     def load_circuits(filepath: str) -> List[QuantumCircuit]:
-        """
-        Loads circuits from a QuDET JSON file.
-        
+        """Load circuits from a QuDET JSON file.
+
         Args:
-            filepath (str): Path to JSON file with saved circuits
-            
+            filepath: Path to JSON file with saved circuits.
+
         Returns:
-            List[QuantumCircuit]: List of loaded quantum circuits
+            List of loaded ``QuantumCircuit`` objects.
         """
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             data = json.load(f)
-            
-        circuits = []
+
+        circuits: List[QuantumCircuit] = []
         for record in data:
-            qasm_str = record['qasm']
+            qasm_str = record["qasm"]
             try:
                 qc = loads(qasm_str)
-            except Exception as e:
-                print(f"Warning: Could not load circuit {record['id']}: {e}")
+            except Exception as exc:
+                logger.warning(
+                    "Could not load circuit %s: %s", record["id"], exc
+                )
                 continue
-                
             circuits.append(qc)
-            
-        print(f"Loaded {len(circuits)} circuits from {filepath}")
+
+        logger.info("Loaded %d circuits from %s", len(circuits), filepath)
         return circuits
 
     @staticmethod
-    def save_model(model, filepath: str) -> None:
-        """
-        Saves a trained QuDET model (like QuantumKMeans) via Pickle.
-        
-        This allows you to save the entire fitted model state,
-        including centroids, metadata, and fitted parameters.
-        
+    def save_model(model: object, filepath: str) -> None:
+        """Save a trained QuDET model via pickle.
+
+        This allows you to save the entire fitted model state, including
+        centroids, metadata, and fitted parameters.
+
         Args:
-            model: Trained QuDET model instance
-            filepath (str): Path to output pickle file
-            
-        Returns:
-            None
+            model: Trained QuDET model instance.
+            filepath: Path to output pickle file.
         """
-        with open(filepath, 'wb') as f:
+        with open(filepath, "wb") as f:
             pickle.dump(model, f)
-        print(f"Saved model to {filepath}")
-            
+        logger.info("Saved model to %s", filepath)
+
     @staticmethod
-    def load_model(filepath: str):
-        """
-        Loads a pickled QuDET model.
-        
+    def load_model(filepath: str) -> object:
+        """Load a pickled QuDET model.
+
+        .. warning::
+
+            **Security**: ``pickle.load`` can execute arbitrary code.
+            Only load pickle files from **trusted** sources.  Never
+            unpickle data received from an untrusted or unauthenticated
+            source.
+
         Args:
-            filepath (str): Path to pickle file
-            
+            filepath: Path to pickle file.
+
         Returns:
-            Loaded model instance
+            Loaded model instance.
         """
-        with open(filepath, 'rb') as f:
-            model = pickle.load(f)
-        print(f"Loaded model from {filepath}")
+        with open(filepath, "rb") as f:
+            model = pickle.load(f)  # noqa: S301
+        logger.info("Loaded model from %s", filepath)
         return model
 
     @staticmethod
     def export_circuit_qasm(circuit: QuantumCircuit, filepath: str) -> None:
-        """
-        Export a single circuit to QASM format.
-        
+        """Export a single circuit to a QASM file.
+
         Args:
-            circuit (QuantumCircuit): Circuit to export
-            filepath (str): Output QASM file path
-            
-        Returns:
-            None
+            circuit: Circuit to export.
+            filepath: Output QASM file path.
         """
         qasm_str = dumps(circuit)
-            
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(qasm_str)
-        print(f"Exported circuit to {filepath}")
+        logger.info("Exported circuit to %s", filepath)
 
     @staticmethod
     def import_circuit_qasm(filepath: str) -> QuantumCircuit:
-        """
-        Import a circuit from QASM format.
-        
+        """Import a circuit from a QASM file.
+
         Args:
-            filepath (str): Path to QASM file
-            
+            filepath: Path to QASM file.
+
         Returns:
-            QuantumCircuit: Imported circuit
+            Imported ``QuantumCircuit``.
         """
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             qasm_str = f.read()
-            
+
         circuit = loads(qasm_str)
-        print(f"Imported circuit from {filepath}")
+        logger.info("Imported circuit from %s", filepath)
         return circuit
