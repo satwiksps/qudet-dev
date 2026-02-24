@@ -1,5 +1,16 @@
-from .base import BaseReducer, BaseEncoder, BaseQuantumEstimator
-from .exceptions import QuDETError, QuantumCapacityError, DriftDetectedError
+"""Core abstractions and exceptions for the QuDET library."""
+
+from .base import BaseEncoder, BaseQuantumEstimator, BaseReducer
+from .exceptions import (
+    BackendError,
+    CircuitError,
+    DriftDetectedError,
+    EncodingError,
+    NotFittedError,
+    QuantumCapacityError,
+    QuDETError,
+    ValidationError,
+)
 
 __all__ = [
     "BaseReducer",
@@ -8,4 +19,9 @@ __all__ = [
     "QuDETError",
     "QuantumCapacityError",
     "DriftDetectedError",
+    "EncodingError",
+    "CircuitError",
+    "ValidationError",
+    "BackendError",
+    "NotFittedError",
 ]

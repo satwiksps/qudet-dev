@@ -1,9 +1,16 @@
-from . import iqp
-from . import rotation
-from . import statevector
-from . import amplitude
-from . import angle_phase
-from . import composite
+"""Quantum data encoders for the QuDET library.
+
+This package provides a variety of classical-to-quantum encoding strategies,
+each mapping classical feature vectors into quantum circuits.
+
+Modules:
+    iqp: IQP (Instantaneous Quantum Polynomial) encoding with entanglement.
+    rotation: Simple rotation-based encoding (R_y gates).
+    statevector: Amplitude-based statevector encoding.
+    amplitude: Amplitude and density-matrix encoders.
+    angle_phase: Angle, phase, hybrid, and parametric encoders.
+    composite: Composite, layered, adaptive, and hierarchical encoders.
+"""
 
 from .iqp import IQPEncoder
 from .rotation import RotationEncoder
@@ -14,7 +21,7 @@ from .amplitude import (
     AmplitudeEncoder,
     DensityMatrixEncoder,
     BasisChangeEncoder,
-    FeatureMapEncoder
+    FeatureMapEncoder,
 )
 
 # Angle and phase encoding
@@ -23,7 +30,7 @@ from .angle_phase import (
     PhaseEncoder,
     HybridAnglePhaseEncoder,
     MultiAxisRotationEncoder,
-    ParametricAngleEncoder
+    ParametricAngleEncoder,
 )
 
 # Composite encoding
@@ -32,28 +39,26 @@ from .composite import (
     LayeredEncoder,
     DataReuseEncoder,
     AdaptiveEncoder,
-    HierarchicalEncoder
+    HierarchicalEncoder,
 )
 
 __all__ = [
-    "iqp",
-    "rotation",
-    "statevector",
-    "amplitude",
-    "angle_phase",
-    "composite",
+    # Core encoders
     "IQPEncoder",
     "RotationEncoder",
     "StatevectorEncoder",
+    # Amplitude encoders
     "AmplitudeEncoder",
     "DensityMatrixEncoder",
     "BasisChangeEncoder",
     "FeatureMapEncoder",
+    # Angle & phase encoders
     "AngleEncoder",
     "PhaseEncoder",
     "HybridAnglePhaseEncoder",
     "MultiAxisRotationEncoder",
     "ParametricAngleEncoder",
+    # Composite encoders
     "CompositeEncoder",
     "LayeredEncoder",
     "DataReuseEncoder",
