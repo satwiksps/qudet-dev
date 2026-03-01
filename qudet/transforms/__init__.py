@@ -1,49 +1,68 @@
-from . import auto
-from . import coresets
-from . import imputation
-from . import pca
-from . import projections
-from . import sketching
-from . import feature_engineering
-from . import encoding
-from . import normalization
+"""Data transformation and reduction utilities for QuDET.
+
+This package provides classical data transformations that prepare raw
+datasets for quantum encoding and execution.  It includes:
+
+* **Dimensionality reduction** — :class:`AutoReducer`, :class:`QuantumPCA`,
+  :class:`RandomProjector`, :class:`CoresetReducer`, :class:`StreamingHasher`.
+* **Feature engineering** — :class:`FeatureScaler`, :class:`FeatureSelector`,
+  :class:`OutlierRemover`, :class:`DataBalancer`.
+* **Encoding** — :class:`CategoricalEncoder`, :class:`TargetEncoder`,
+  :class:`FrequencyEncoder`, :class:`BinningEncoder`.
+* **Normalisation** — :class:`QuantumNormalizer`, :class:`RangeNormalizer`,
+  :class:`DecimalScaler`, :class:`LogTransformer`, :class:`PowerTransformer`.
+* **Imputation** — :class:`QuantumImputer`.
+"""
+
 from .auto import AutoReducer
 from .coresets import CoresetReducer
+from .encoding import (
+    BinningEncoder,
+    CategoricalEncoder,
+    FrequencyEncoder,
+    TargetEncoder,
+)
+from .feature_engineering import (
+    DataBalancer,
+    FeatureScaler,
+    FeatureSelector,
+    OutlierRemover,
+)
 from .imputation import QuantumImputer
+from .normalization import (
+    DecimalScaler,
+    LogTransformer,
+    PowerTransformer,
+    QuantumNormalizer,
+    RangeNormalizer,
+)
 from .pca import QuantumPCA
 from .projections import RandomProjector
 from .sketching import StreamingHasher
-from .feature_engineering import FeatureScaler, FeatureSelector, OutlierRemover, DataBalancer
-from .encoding import CategoricalEncoder, TargetEncoder, FrequencyEncoder, BinningEncoder
-from .normalization import QuantumNormalizer, RangeNormalizer, DecimalScaler, LogTransformer, PowerTransformer
 
 __all__ = [
-    "auto",
-    "coresets",
-    "imputation",
-    "pca",
-    "projections",
-    "sketching",
-    "feature_engineering",
-    "encoding",
-    "normalization",
+    # Dimensionality reduction
     "AutoReducer",
     "CoresetReducer",
-    "QuantumImputer",
     "QuantumPCA",
     "RandomProjector",
     "StreamingHasher",
+    # Feature engineering
     "FeatureScaler",
     "FeatureSelector",
     "OutlierRemover",
     "DataBalancer",
+    # Encoding
     "CategoricalEncoder",
     "TargetEncoder",
     "FrequencyEncoder",
     "BinningEncoder",
+    # Normalisation
     "QuantumNormalizer",
     "RangeNormalizer",
     "DecimalScaler",
     "LogTransformer",
     "PowerTransformer",
+    # Imputation
+    "QuantumImputer",
 ]

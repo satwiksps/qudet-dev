@@ -1,386 +1,538 @@
-"""
-Feature engineering and selection methods for quantum data preprocessing.
+"""Feature engineering and selection methods for quantum data preprocessing.
 
-Provides feature scaling, normalization, and selection techniques
-for quantum machine learning pipelines.
+Provides feature scaling, normalization, selection, outlier removal, and
+data balancing techniques for quantum machine learning pipelines.
 """
+
+import logging
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from typing import Union, Optional, List, Tuple
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler
 from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
+
 from qudet.core.base import BaseReducer
+from qudet.core.exceptions import NotFittedError, ValidationError
+
+logger = logging.getLogger(__name__)
 
 
 class FeatureScaler(BaseReducer):
-    """
-    Scales and normalizes features for quantum algorithms.
-    
+    """Scales and normalises features for quantum algorithms.
+
     Provides multiple scaling strategies:
-    - Standard scaling (z-score normalization)
-    - Min-Max scaling (0-1 range)
-    - Robust scaling (resistant to outliers)
-    - Quantum-aware scaling (preserves quantum structure)
-    
-    Best for: Feature normalization, preprocessing, standardization.
+
+    * **standard** — Z-score normalisation (zero mean, unit variance).
+    * **minmax** — Linear scaling to a specified ``feature_range``.
+    * **robust** — Median / IQR scaling (resistant to outliers).
+    * **quantum** — Standard scaling followed by per-sample L2 normalisation.
+
+    Args:
+        method: Scaling method (``'standard'``, ``'minmax'``, ``'robust'``,
+            ``'quantum'``).
+        feature_range: Output range for ``'minmax'`` scaling.
+
+    Example:
+        >>> scaler = FeatureScaler(method="minmax", feature_range=(0, 1))
+        >>> scaler.fit(X_train).transform(X_test)
     """
-    
-    def __init__(self, method: str = "standard", feature_range: Tuple = (0, 1)):
-        """
-        Initialize feature scaler.
-        
-        Args:
-            method: Scaling method ('standard', 'minmax', 'robust', 'quantum')
-            feature_range: Range for min-max scaling
-        """
+
+    def __init__(
+        self,
+        method: str = "standard",
+        feature_range: Tuple[float, float] = (0, 1),
+    ) -> None:
         self.method = method.lower()
         self.feature_range = feature_range
         self.scaler = self._create_scaler()
         self.fitted = False
 
     def _create_scaler(self):
-        """Create appropriate scaler based on method."""
+        """Create the appropriate sklearn scaler based on *method*."""
         if self.method == "standard":
             return StandardScaler()
         elif self.method == "minmax":
             return MinMaxScaler(feature_range=self.feature_range)
         elif self.method == "robust":
             return RobustScaler()
-        else:
+        elif self.method == "quantum":
             return StandardScaler()
+        else:
+            raise ValidationError(
+                f"Unknown scaling method {self.method!r}. "
+                "Choose from 'standard', 'minmax', 'robust', 'quantum'."
+            )
 
-    def fit(self, X: Union[np.ndarray, pd.DataFrame]) -> 'FeatureScaler':
-        """
-        Fit scaler to data.
-        
+    def fit(
+        self,
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Optional[np.ndarray] = None,
+    ) -> "FeatureScaler":
+        """Fit scaler to training data.
+
         Args:
-            X: Input features
-            
+            X: Input features of shape ``(n_samples, n_features)``.
+            y: Ignored. Present for API compatibility.
+
         Returns:
-            Self
+            self
         """
         if isinstance(X, pd.DataFrame):
             X = X.values
-        
+
         self.scaler.fit(X)
         self.fitted = True
+        logger.info("FeatureScaler (method=%s) fitted", self.method)
         return self
 
     def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
-        """
-        Transform features using fitted scaler.
-        
+        """Transform features using the fitted scaler.
+
         Args:
-            X: Input features
-            
+            X: Input features of shape ``(n_samples, n_features)``.
+
         Returns:
-            Scaled features
+            Scaled features as ``np.ndarray``.
+
+        Raises:
+            NotFittedError: If :meth:`fit` has not been called.
         """
         if not self.fitted:
-            raise ValueError("Scaler must be fitted before transform")
-        
+            raise NotFittedError(
+                "FeatureScaler has not been fitted. Call fit() first."
+            )
+
         if isinstance(X, pd.DataFrame):
             X = X.values
-        
+
         scaled = self.scaler.transform(X)
-        
-        # Apply quantum-aware scaling if requested
+
         if self.method == "quantum":
             scaled = self._apply_quantum_scaling(scaled)
-        
+
         return scaled
 
-    def fit_transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
-        """Fit and transform in one step."""
-        return self.fit(X).transform(X)
-
     def _apply_quantum_scaling(self, X: np.ndarray) -> np.ndarray:
-        """Apply quantum-aware scaling preserving structure."""
-        # Normalize to unit norm per sample
+        """Apply per-sample L2 normalisation (quantum-aware scaling)."""
         norms = np.linalg.norm(X, axis=1, keepdims=True)
         norms[norms == 0] = 1
         return X / norms
 
     def get_scaling_params(self) -> dict:
-        """Get scaling parameters."""
+        """Return the learned scaling parameters.
+
+        Returns:
+            Dictionary containing method, fitted status, and any learned
+            statistics (mean, scale).
+        """
         if not self.fitted:
             return {}
-        
-        params = {
-            "method": self.method,
-            "fitted": self.fitted
-        }
-        
-        if hasattr(self.scaler, 'mean_'):
+
+        params: dict = {"method": self.method, "fitted": self.fitted}
+
+        if hasattr(self.scaler, "mean_"):
             params["mean"] = self.scaler.mean_
-        if hasattr(self.scaler, 'scale_'):
+        if hasattr(self.scaler, "scale_"):
             params["scale"] = self.scaler.scale_
-        
+
         return params
 
 
 class FeatureSelector(BaseReducer):
+    """Selects the most informative features for quantum algorithms.
+
+    Reduces dimensionality by retaining features with the highest scores
+    according to a univariate statistical test.
+
+    Supported methods:
+
+    * **f_classif** — ANOVA F-statistic.
+    * **mutual_info** — Mutual information (non-linear dependencies).
+
+    Args:
+        n_features: Number of top features to keep.
+        method: Scoring method (``'f_classif'`` or ``'mutual_info'``).
+
+    Note:
+        ``fit()`` requires target labels *y* because both scoring methods
+        are supervised.
     """
-    Selects most important features for quantum algorithms.
-    
-    Reduces dimensionality by selecting features with highest scores
-    using statistical tests or mutual information.
-    
-    Best for: Feature selection, dimensionality reduction, feature importance.
-    """
-    
-    def __init__(self, n_features: int = 10, method: str = "f_classif"):
-        """
-        Initialize feature selector.
-        
-        Args:
-            n_features: Number of features to select
-            method: Selection method ('f_classif', 'mutual_info')
-        """
+
+    def __init__(self, n_features: int = 10, method: str = "f_classif") -> None:
+        if not isinstance(n_features, int) or n_features < 1:
+            raise ValidationError(
+                f"n_features must be a positive integer, got {n_features!r}"
+            )
         self.n_features = n_features
         self.method = method
-        self.selector = None
-        self.feature_indices_ = None
-        self.feature_scores_ = None
+        self.selector: Optional[SelectKBest] = None
+        self.feature_indices_: Optional[np.ndarray] = None
+        self.feature_scores_: Optional[np.ndarray] = None
 
-    def fit(self, X: Union[np.ndarray, pd.DataFrame], 
-            y: Union[np.ndarray, pd.Series]) -> 'FeatureSelector':
-        """
-        Fit feature selector.
-        
+    def fit(
+        self,
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Union[np.ndarray, pd.Series, None] = None,
+    ) -> "FeatureSelector":
+        """Fit the feature selector.
+
         Args:
-            X: Input features
-            y: Target values
-            
+            X: Input features of shape ``(n_samples, n_features)``.
+            y: Target values. **Required** for scoring.
+
         Returns:
-            Self
+            self
+
+        Raises:
+            ValidationError: If *y* is ``None``.
         """
+        if y is None:
+            raise ValidationError(
+                "FeatureSelector requires target labels y for fitting."
+            )
         if isinstance(X, pd.DataFrame):
             X = X.values
         if isinstance(y, pd.Series):
             y = y.values
-        
-        if self.method == "f_classif":
-            score_func = f_classif
-        elif self.method == "mutual_info":
+
+        if self.method == "mutual_info":
             score_func = mutual_info_classif
         else:
             score_func = f_classif
-        
+
         self.selector = SelectKBest(score_func, k=self.n_features)
         self.selector.fit(X, y)
-        
+
         self.feature_indices_ = self.selector.get_support(indices=True)
         self.feature_scores_ = self.selector.scores_
-        
+
+        logger.info(
+            "FeatureSelector selected %d features using %s",
+            self.n_features,
+            self.method,
+        )
         return self
 
     def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
-        """
-        Transform features to selected subset.
-        
+        """Select the fitted subset of features from *X*.
+
         Args:
-            X: Input features
-            
+            X: Input features of shape ``(n_samples, n_features)``.
+
         Returns:
-            Selected features
+            Selected features of shape ``(n_samples, n_features_selected)``.
+
+        Raises:
+            NotFittedError: If :meth:`fit` has not been called.
         """
         if self.selector is None:
-            raise ValueError("Selector must be fitted before transform")
-        
+            raise NotFittedError(
+                "FeatureSelector has not been fitted. Call fit() first."
+            )
+
         if isinstance(X, pd.DataFrame):
             X = X.values
-        
+
         return self.selector.transform(X)
 
-    def fit_transform(self, X: Union[np.ndarray, pd.DataFrame],
-                     y: Union[np.ndarray, pd.Series]) -> np.ndarray:
-        """Fit and transform in one step."""
-        return self.fit(X, y).transform(X)
-
     def get_selected_features(self) -> np.ndarray:
-        """Get indices of selected features."""
+        """Return the indices of features selected during ``fit``.
+
+        Raises:
+            NotFittedError: If the selector has not been fitted.
+        """
         if self.feature_indices_ is None:
-            raise ValueError("Selector not fitted")
+            raise NotFittedError("FeatureSelector has not been fitted.")
         return self.feature_indices_
 
     def get_feature_scores(self) -> np.ndarray:
-        """Get feature importance scores."""
+        """Return per-feature importance scores from ``fit``.
+
+        Raises:
+            NotFittedError: If the selector has not been fitted.
+        """
         if self.feature_scores_ is None:
-            raise ValueError("Selector not fitted")
+            raise NotFittedError("FeatureSelector has not been fitted.")
         return self.feature_scores_
 
 
 class OutlierRemover(BaseReducer):
+    """Removes outliers from datasets using multiple detection strategies.
+
+    Supported methods:
+
+    * **iqr** — Interquartile-Range fence (1.5 × IQR).
+    * **zscore** — Absolute z-score exceeding ``threshold``.
+    * **isolation** — Distance-from-mean exceeding
+      ``mean + threshold × std``.
+
+    Unlike the previous implementation that stored a mask from ``fit`` and
+    blindly applied it during ``transform``, this version stores the
+    **statistical parameters** (bounds / thresholds) during ``fit`` and
+    **recomputes** the outlier mask on whatever data is passed to
+    ``transform``.
+
+    Args:
+        method: Detection method (``'iqr'``, ``'zscore'``, ``'isolation'``).
+        threshold: Sensitivity parameter (z-score cut-off or distance
+            multiplier).
     """
-    Removes outliers from datasets using multiple strategies.
-    
-    Methods:
-    - IQR (Interquartile Range)
-    - Z-score
-    - Isolation Forest
-    - Local Outlier Factor
-    
-    Best for: Data cleaning, outlier removal, robust preprocessing.
-    """
-    
-    def __init__(self, method: str = "iqr", threshold: float = 3.0):
-        """
-        Initialize outlier remover.
-        
-        Args:
-            method: Outlier detection method ('iqr', 'zscore', 'isolation', 'lof')
-            threshold: Detection threshold
-        """
+
+    def __init__(self, method: str = "iqr", threshold: float = 3.0) -> None:
         self.method = method.lower()
         self.threshold = threshold
-        self.outlier_mask_ = None
+        # Learned parameters
+        self._lower_bound: Optional[np.ndarray] = None
+        self._upper_bound: Optional[np.ndarray] = None
+        self._mean: Optional[np.ndarray] = None
+        self._std: Optional[np.ndarray] = None
+        self._dist_threshold: Optional[float] = None
+        self.fitted = False
 
-    def fit(self, X: Union[np.ndarray, pd.DataFrame]) -> 'OutlierRemover':
-        """
-        Detect outliers in data.
-        
+    def fit(
+        self,
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Optional[np.ndarray] = None,
+    ) -> "OutlierRemover":
+        """Learn outlier detection parameters from training data.
+
         Args:
-            X: Input data
-            
+            X: Training data of shape ``(n_samples, n_features)``.
+            y: Ignored. Present for API compatibility.
+
         Returns:
-            Self
+            self
         """
         if isinstance(X, pd.DataFrame):
             X = X.values
-        
+
         if self.method == "iqr":
-            self.outlier_mask_ = self._detect_iqr(X)
+            q1 = np.percentile(X, 25, axis=0)
+            q3 = np.percentile(X, 75, axis=0)
+            iqr = q3 - q1
+            self._lower_bound = q1 - 1.5 * iqr
+            self._upper_bound = q3 + 1.5 * iqr
         elif self.method == "zscore":
-            self.outlier_mask_ = self._detect_zscore(X)
+            self._mean = np.mean(X, axis=0)
+            self._std = np.std(X, axis=0) + 1e-10
         elif self.method == "isolation":
-            self.outlier_mask_ = self._detect_isolation(X)
+            self._mean = np.mean(X, axis=0)
+            distances = np.linalg.norm(X - self._mean, axis=1)
+            self._dist_threshold = float(
+                np.mean(distances) + self.threshold * np.std(distances)
+            )
         else:
-            self.outlier_mask_ = self._detect_iqr(X)
-        
+            raise ValidationError(
+                f"Unknown outlier detection method {self.method!r}. "
+                "Choose from 'iqr', 'zscore', 'isolation'."
+            )
+
+        self.fitted = True
+        logger.info("OutlierRemover (method=%s) fitted", self.method)
         return self
 
     def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
-        """
-        Remove outliers from data.
-        
+        """Remove outliers from *X* using parameters learned during ``fit``.
+
+        The outlier mask is **recomputed** on the incoming data using the
+        statistical boundaries / thresholds stored during ``fit``.
+
         Args:
-            X: Input data
-            
+            X: Data of shape ``(n_samples, n_features)``.
+
         Returns:
-            Data without outliers
+            Filtered data with outlier rows removed.
+
+        Raises:
+            NotFittedError: If :meth:`fit` has not been called.
         """
-        if self.outlier_mask_ is None:
-            raise ValueError("Remover not fitted")
-        
+        if not self.fitted:
+            raise NotFittedError(
+                "OutlierRemover has not been fitted. Call fit() first."
+            )
+
         if isinstance(X, pd.DataFrame):
             X = X.values
-        
-        return X[self.outlier_mask_]
 
-    def fit_transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
-        """Fit and transform in one step."""
-        return self.fit(X).transform(X)
+        mask = self._compute_inlier_mask(X)
+        return X[mask]
 
-    def _detect_iqr(self, X: np.ndarray) -> np.ndarray:
-        """Detect outliers using IQR method."""
-        Q1 = np.percentile(X, 25, axis=0)
-        Q3 = np.percentile(X, 75, axis=0)
-        IQR = Q3 - Q1
-        
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        
-        mask = np.all((X >= lower_bound) & (X <= upper_bound), axis=1)
-        return mask
+    def _compute_inlier_mask(self, X: np.ndarray) -> np.ndarray:
+        """Return a boolean mask where ``True`` marks inlier rows."""
+        if self.method == "iqr":
+            return np.all(
+                (X >= self._lower_bound) & (X <= self._upper_bound), axis=1
+            )
+        elif self.method == "zscore":
+            z_scores = np.abs((X - self._mean) / self._std)
+            return np.all(z_scores < self.threshold, axis=1)
+        elif self.method == "isolation":
+            distances = np.linalg.norm(X - self._mean, axis=1)
+            return distances <= self._dist_threshold
+        # Should be unreachable after validation in fit()
+        return np.ones(X.shape[0], dtype=bool)  # pragma: no cover
 
-    def _detect_zscore(self, X: np.ndarray) -> np.ndarray:
-        """Detect outliers using z-score method."""
-        z_scores = np.abs((X - np.mean(X, axis=0)) / (np.std(X, axis=0) + 1e-10))
-        mask = np.all(z_scores < self.threshold, axis=1)
-        return mask
+    def get_outlier_ratio(self, X: Union[np.ndarray, pd.DataFrame]) -> float:
+        """Compute the fraction of outliers in *X*.
 
-    def _detect_isolation(self, X: np.ndarray) -> np.ndarray:
-        """Detect outliers using isolation approach."""
-        # Simplified isolation: samples far from mean
-        distances = np.linalg.norm(X - np.mean(X, axis=0), axis=1)
-        threshold = np.mean(distances) + self.threshold * np.std(distances)
-        mask = distances <= threshold
-        return mask
+        Args:
+            X: Data to evaluate.
 
-    def get_outlier_ratio(self) -> float:
-        """Get ratio of outliers removed."""
-        if self.outlier_mask_ is None:
-            return 0.0
-        return 1.0 - np.mean(self.outlier_mask_)
+        Returns:
+            Ratio of outlier samples (0.0 = no outliers, 1.0 = all outliers).
+
+        Raises:
+            NotFittedError: If :meth:`fit` has not been called.
+        """
+        if not self.fitted:
+            raise NotFittedError(
+                "OutlierRemover has not been fitted. Call fit() first."
+            )
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+        mask = self._compute_inlier_mask(X)
+        return 1.0 - float(np.mean(mask))
 
 
 class DataBalancer(BaseReducer):
+    """Balances imbalanced datasets for classification tasks.
+
+    Stores the target labels *y* during ``fit`` and uses them during
+    ``transform`` so that the ``transform(X)`` signature matches the
+    :class:`BaseReducer` contract.
+
+    Supported methods:
+
+    * **oversample** — Duplicate minority-class samples.
+    * **undersample** — Sub-sample majority-class samples.
+    * **smote** — Generate synthetic samples via linear interpolation
+      between minority-class neighbours.
+
+    Args:
+        method: Balancing method (``'oversample'``, ``'undersample'``,
+            ``'smote'``).
+        ratio: Target minority / majority ratio (currently unused;
+            reserved for future extension).
+
+    Note:
+        Because balancing requires labels, *y* **must** be provided to
+        ``fit()``.  The balanced ``(X, y)`` tuple is returned by
+        ``transform()`` as a vertically stacked array where the last
+        column contains the labels.
     """
-    Balances imbalanced datasets for classification.
-    
-    Methods:
-    - Oversampling (duplicate minority class)
-    - Undersampling (reduce majority class)
-    - SMOTE-like (synthetic examples)
-    - Stratified sampling
-    
-    Best for: Handling class imbalance, data balancing.
-    """
-    
-    def __init__(self, method: str = "oversample", ratio: float = 1.0):
-        """
-        Initialize data balancer.
-        
-        Args:
-            method: Balancing method ('oversample', 'undersample', 'smote', 'stratified')
-            ratio: Target ratio of minority to majority class
-        """
+
+    def __init__(self, method: str = "oversample", ratio: float = 1.0) -> None:
         self.method = method.lower()
         self.ratio = ratio
-        self.class_counts_ = None
+        self.class_counts_: Optional[dict] = None
+        self._y_fit: Optional[np.ndarray] = None
 
-    def fit(self, X: Union[np.ndarray, pd.DataFrame],
-            y: Union[np.ndarray, pd.Series]) -> 'DataBalancer':
-        """
-        Analyze class distribution.
-        
-        Args:
-            X: Input features
-            y: Target labels
-            
-        Returns:
-            Self
-        """
-        if isinstance(y, pd.Series):
-            y = y.values
-        
-        unique, counts = np.unique(y, return_counts=True)
-        self.class_counts_ = dict(zip(unique, counts))
-        
-        return self
+    def fit(
+        self,
+        X: Union[np.ndarray, pd.DataFrame],
+        y: Union[np.ndarray, pd.Series, None] = None,
+    ) -> "DataBalancer":
+        """Analyse class distribution and store labels for transform.
 
-    def transform(self, X: Union[np.ndarray, pd.DataFrame],
-                 y: Union[np.ndarray, pd.Series]) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Balance dataset.
-        
         Args:
-            X: Input features
-            y: Target labels
-            
+            X: Input features of shape ``(n_samples, n_features)``.
+            y: Target labels. **Required**.
+
         Returns:
-            Tuple of (balanced_X, balanced_y)
+            self
+
+        Raises:
+            ValidationError: If *y* is ``None``.
         """
-        if self.class_counts_ is None:
-            raise ValueError("Balancer not fitted")
-        
+        if y is None:
+            raise ValidationError(
+                "DataBalancer requires target labels y for fitting."
+            )
         if isinstance(X, pd.DataFrame):
             X = X.values
         if isinstance(y, pd.Series):
             y = y.values
-        
+
+        unique, counts = np.unique(y, return_counts=True)
+        self.class_counts_ = dict(zip(unique, counts))
+        self._y_fit = y.copy()
+
+        logger.info(
+            "DataBalancer (method=%s) fitted — class counts: %s",
+            self.method,
+            self.class_counts_,
+        )
+        return self
+
+    def transform(self, X: Union[np.ndarray, pd.DataFrame]) -> np.ndarray:
+        """Balance the dataset using labels stored during ``fit``.
+
+        Returns the balanced feature matrix.  Use
+        :meth:`transform_with_labels` if you also need the balanced *y*.
+
+        Args:
+            X: Input features of shape ``(n_samples, n_features)``.
+
+        Returns:
+            Balanced feature array of shape ``(n_balanced, n_features)``.
+
+        Raises:
+            NotFittedError: If :meth:`fit` has not been called.
+            ValidationError: If *X* length does not match stored *y*.
+        """
+        if self.class_counts_ is None or self._y_fit is None:
+            raise NotFittedError(
+                "DataBalancer has not been fitted. Call fit(X, y) first."
+            )
+
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+
+        if X.shape[0] != self._y_fit.shape[0]:
+            raise ValidationError(
+                f"X has {X.shape[0]} samples but fit() stored "
+                f"{self._y_fit.shape[0]} labels. Pass the same X used in fit()."
+            )
+
+        balanced_X, _ = self._balance(X, self._y_fit)
+        return balanced_X
+
+    def transform_with_labels(
+        self, X: Union[np.ndarray, pd.DataFrame]
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Balance the dataset and return both features and labels.
+
+        Args:
+            X: Input features of shape ``(n_samples, n_features)``.
+
+        Returns:
+            ``(balanced_X, balanced_y)`` tuple.
+        """
+        if self.class_counts_ is None or self._y_fit is None:
+            raise NotFittedError(
+                "DataBalancer has not been fitted. Call fit(X, y) first."
+            )
+
+        if isinstance(X, pd.DataFrame):
+            X = X.values
+
+        if X.shape[0] != self._y_fit.shape[0]:
+            raise ValidationError(
+                f"X has {X.shape[0]} samples but fit() stored "
+                f"{self._y_fit.shape[0]} labels."
+            )
+
+        return self._balance(X, self._y_fit)
+
+    # ------------------------------------------------------------------
+    # Internal balancing strategies
+    # ------------------------------------------------------------------
+
+    def _balance(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Dispatch to the configured balancing method."""
         if self.method == "oversample":
             return self._oversample(X, y)
         elif self.method == "undersample":
@@ -388,95 +540,103 @@ class DataBalancer(BaseReducer):
         elif self.method == "smote":
             return self._smote_balance(X, y)
         else:
-            return self._oversample(X, y)
+            raise ValidationError(
+                f"Unknown balancing method {self.method!r}. "
+                "Choose from 'oversample', 'undersample', 'smote'."
+            )
 
-    def _oversample(self, X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Oversample minority class."""
+    def _oversample(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Oversample minority classes to match the majority class count."""
         unique_classes = np.unique(y)
-        y_int = y.astype(int)
-        counts = np.bincount(y_int)
-        max_count = np.max(counts)
-        
-        X_balanced, y_balanced = [], []
-        
+        max_count = max(np.sum(y == cls) for cls in unique_classes)
+
+        X_balanced: List[np.ndarray] = []
+        y_balanced: List[np.ndarray] = []
+
         for cls in unique_classes:
             mask = y == cls
             X_cls = X[mask]
             y_cls = y[mask]
-            
+
             if len(X_cls) < max_count:
-                # Oversample
                 indices = np.random.choice(len(X_cls), max_count, replace=True)
                 X_cls = X_cls[indices]
                 y_cls = y_cls[indices]
-            
+
             X_balanced.append(X_cls)
             y_balanced.append(y_cls)
-        
+
         return np.vstack(X_balanced), np.hstack(y_balanced)
 
-    def _undersample(self, X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Undersample majority class."""
+    def _undersample(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Undersample majority classes to match the minority class count."""
         unique_classes = np.unique(y)
-        y_int = y.astype(int)
-        counts = np.bincount(y_int)
-        min_count = np.min(counts)
-        
-        X_balanced, y_balanced = [], []
-        
+        min_count = min(np.sum(y == cls) for cls in unique_classes)
+
+        X_balanced: List[np.ndarray] = []
+        y_balanced: List[np.ndarray] = []
+
         for cls in unique_classes:
             mask = y == cls
             X_cls = X[mask]
             y_cls = y[mask]
-            
+
             if len(X_cls) > min_count:
-                # Undersample
                 indices = np.random.choice(len(X_cls), min_count, replace=False)
                 X_cls = X_cls[indices]
                 y_cls = y_cls[indices]
-            
+
             X_balanced.append(X_cls)
             y_balanced.append(y_cls)
-        
+
         return np.vstack(X_balanced), np.hstack(y_balanced)
 
-    def _smote_balance(self, X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """SMOTE-like synthetic example generation."""
-        # Simplified SMOTE: generate examples between nearest neighbors
+    def _smote_balance(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """SMOTE-like synthetic sample generation for minority classes."""
         unique_classes = np.unique(y)
-        X_balanced, y_balanced = [], []
-        y_int = y.astype(int)
-        counts = np.bincount(y_int)
-        max_count = np.max(counts)
-        
+        max_count = max(np.sum(y == cls) for cls in unique_classes)
+
+        X_balanced: List[np.ndarray] = []
+        y_balanced: List[np.ndarray] = []
+
         for cls in unique_classes:
             mask = y == cls
             X_cls = X[mask]
             y_cls = y[mask]
-            
+
             X_balanced.append(X_cls)
             y_balanced.append(y_cls)
-            
-            # Generate synthetic examples
+
             if len(X_cls) < max_count:
                 n_synthetic = max_count - len(X_cls)
                 for _ in range(n_synthetic):
-                    # Pick random sample and random neighbor
                     idx1 = np.random.randint(len(X_cls))
                     idx2 = np.random.randint(len(X_cls))
-                    # Interpolate between them
                     alpha = np.random.random()
                     synthetic = alpha * X_cls[idx1] + (1 - alpha) * X_cls[idx2]
                     X_balanced.append(synthetic.reshape(1, -1))
-                    y_balanced.append(cls)
-        
+                    y_balanced.append(np.array([cls]))
+
         return np.vstack(X_balanced), np.hstack(y_balanced)
 
     def get_balance_info(self) -> dict:
-        """Get class balance information."""
+        """Return class-balance statistics from the training data.
+
+        Returns:
+            Dictionary with ``class_counts`` and ``imbalance_ratio``.
+        """
         if self.class_counts_ is None:
             return {}
         return {
             "class_counts": self.class_counts_,
-            "imbalance_ratio": max(self.class_counts_.values()) / min(self.class_counts_.values())
+            "imbalance_ratio": (
+                max(self.class_counts_.values())
+                / min(self.class_counts_.values())
+            ),
         }
