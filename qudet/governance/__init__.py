@@ -1,79 +1,61 @@
-from . import cost
-from . import drift
-from . import integrity
-from . import monitor
-from . import privacy
-from . import simulation
-from . import validation
-from . import visualization
-from . import audit
-from . import security
-from . import orchestration
+"""Governance module for QuDET.
 
+Provides monitoring, security, auditing, privacy, drift detection, cost
+estimation, orchestration, and validation tools for quantum data pipelines.
+"""
+
+from .audit import AuditEvent, AuditLogger, ComplianceChecker, DataGovernance
 from .cost import ResourceEstimator
 from .drift import QuantumDriftDetector
 from .integrity import DataIntegrityCheck
 from .monitor import JobMonitor
-from .privacy import QuantumDifferentialPrivacy
-from .simulation import NoiseSimulator
-from .visualization import plot_reduction_2d, plot_kernel_matrix
-
-# Audit and compliance
-from .audit import (
-    AuditLogger,
-    ComplianceChecker,
-    DataGovernance,
-    AuditEvent
-)
-
-# Security
-from .security import (
-    SecureAccessControl,
-    EncryptionManager,
-    SecurityMonitor,
-    AccessLevel
-)
-
-# Orchestration
 from .orchestration import (
-    Workflow,
     ResourceScheduler,
     Task,
     TaskStatus,
-    WorkflowStatus
+    Workflow,
+    WorkflowStatus,
 )
+from .privacy import QuantumDifferentialPrivacy
+from .security import (
+    AccessLevel,
+    EncryptionManager,
+    SecureAccessControl,
+    SecurityMonitor,
+)
+from .simulation import NoiseSimulator
+from .validation import check_quantum_capacity
+from .visualization import plot_kernel_matrix, plot_reduction_2d
 
 __all__ = [
-    "cost",
-    "drift",
-    "integrity",
-    "monitor",
-    "privacy",
-    "simulation",
-    "validation",
-    "visualization",
-    "audit",
-    "security",
-    "orchestration",
+    # Cost & drift
     "ResourceEstimator",
     "QuantumDriftDetector",
+    # Integrity & monitoring
     "DataIntegrityCheck",
     "JobMonitor",
+    # Privacy & simulation
     "QuantumDifferentialPrivacy",
     "NoiseSimulator",
+    # Visualization
     "plot_reduction_2d",
     "plot_kernel_matrix",
+    # Audit
     "AuditLogger",
     "ComplianceChecker",
     "DataGovernance",
     "AuditEvent",
+    # Security
     "SecureAccessControl",
     "EncryptionManager",
     "SecurityMonitor",
     "AccessLevel",
+    # Orchestration
     "Workflow",
     "ResourceScheduler",
     "Task",
     "TaskStatus",
     "WorkflowStatus",
+    # Validation
+    "check_quantum_capacity",
 ]
