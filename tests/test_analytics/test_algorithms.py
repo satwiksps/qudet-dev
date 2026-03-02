@@ -93,5 +93,6 @@ def test_kmeans_unfitted_error():
     kmeans = QuantumKMeans(n_clusters=2, n_qubits=2, max_iter=1)
     X_test = np.array([[0.1, 0.1], [0.9, 0.9]])
     
-    with pytest.raises(RuntimeError):
+    from qudet.core.exceptions import NotFittedError
+    with pytest.raises(NotFittedError):
         kmeans.predict(pd.DataFrame(X_test))
