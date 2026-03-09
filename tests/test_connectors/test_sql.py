@@ -13,7 +13,7 @@ class TestQuantumSQLLoader:
         """Test that missing SQLAlchemy raises ImportError."""
         # This would need to mock the import, which is complex
         # So we just test the error message
-        import qudet.io.sql as sql_module
+        import qudet.connectors.sql as sql_module
         
         if not sql_module.HAS_SQL:
             with pytest.raises(ImportError):

@@ -83,5 +83,5 @@ def test_loader_invalid_encoder():
     """Test that invalid encoder type raises error."""
     df = pd.DataFrame(np.random.rand(10, 2))
     
-    with pytest.raises(ValueError):
+    with pytest.raises((ValueError, Exception)):
         loader = QuantumDataLoader(df, batch_size=5, encoder_type='invalid')

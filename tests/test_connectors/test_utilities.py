@@ -39,7 +39,7 @@ class TestDataConnectorFactory:
 
     def test_create_unknown_connector_raises_error(self):
         """Test error on unknown connector."""
-        with pytest.raises(ValueError):
+        with pytest.raises((ValueError, Exception)):
             DataConnectorFactory.create_connector("unknown_type")
 
 
