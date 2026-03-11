@@ -1,9 +1,3 @@
-"""
-Comprehensive tests for composite and hybrid encoding methods.
-
-Tests composite, layered, data reuse, adaptive, and hierarchical encoders.
-"""
-
 import pytest
 import numpy as np
 from qiskit import QuantumCircuit
@@ -14,6 +8,15 @@ from qudet.encoders.composite import (
     AdaptiveEncoder,
     HierarchicalEncoder
 )
+from qudet.core.base import BaseEncoder
+
+
+class _MockEncoder(BaseEncoder):
+    """Minimal BaseEncoder for testing."""
+    def __init__(self, n_qubits=2):
+        self.n_qubits = n_qubits
+    def encode(self, data):
+        return QuantumCircuit(self.n_qubits)
 
 
 class TestCompositeEncoder:
@@ -28,15 +31,8 @@ class TestCompositeEncoder:
     def test_add_encoder(self):
         """Test adding encoders."""
         composite = CompositeEncoder(n_qubits=2)
-        
-        # Create mock encoder (minimal implementation)
-        class MockEncoder:
-            def encode(self, data):
-                return QuantumCircuit(2)
-        
-        mock = MockEncoder()
+        mock = _MockEncoder(n_qubits=2)
         composite.add_encoder(mock)
-        
         assert len(composite.encoders) == 1
 
     def test_encode_empty(self):
@@ -44,20 +40,13 @@ class TestCompositeEncoder:
         encoder = CompositeEncoder(n_qubits=2)
         data = np.array([0.5, 0.5])
         circuit = encoder.encode(data)
-        
         assert circuit.num_qubits == 2
 
     def test_get_encoder_info(self):
         """Test getting encoder information."""
         encoder = CompositeEncoder(n_qubits=2)
-        
-        class MockEncoder:
-            def encode(self, data):
-                return QuantumCircuit(2)
-        
-        encoder.add_encoder(MockEncoder())
+        encoder.add_encoder(_MockEncoder(n_qubits=2))
         info = encoder.get_encoder_info()
-        
         assert len(info) == 1
 
 

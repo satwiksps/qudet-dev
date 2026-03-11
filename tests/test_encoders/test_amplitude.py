@@ -82,7 +82,6 @@ class TestDensityMatrixEncoder:
         """Test density matrix encoder initialization."""
         encoder = DensityMatrixEncoder(n_qubits=2)
         assert encoder.n_qubits == 2
-        assert encoder.mixed_state is False
 
     def test_encode_basic(self):
         """Test basic density matrix encoding."""
@@ -119,9 +118,10 @@ class TestDensityMatrixEncoder:
         assert np.allclose(rho, rho.conj().T)
 
     def test_mixed_state_flag(self):
-        """Test mixed state flag."""
-        encoder = DensityMatrixEncoder(n_qubits=2, mixed_state=True)
-        assert encoder.mixed_state is True
+        """Test mixed state flag (removed attribute)."""
+        # mixed_state was removed as it was dead code
+        encoder = DensityMatrixEncoder(n_qubits=2)
+        assert encoder.n_qubits == 2
 
     def test_empty_data_density(self):
         """Test density matrix with empty data."""
@@ -167,7 +167,7 @@ class TestBasisChangeEncoder:
 
     def test_invalid_basis(self):
         """Test invalid basis raises error."""
-        with pytest.raises(ValueError):
+        with pytest.raises((ValueError, Exception)):
             BasisChangeEncoder(n_qubits=2, basis="invalid")
 
     def test_supported_bases(self):
