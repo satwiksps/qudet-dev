@@ -32,7 +32,7 @@ def test_full_pipeline_execution():
     reducer.fit(df_selected)
     data_reduced = reducer.transform(df_selected)
     
-    assert data_reduced.shape == (5, 3)
+    assert data_reduced.shape == (100, 3)  # Maps each point to nearest center
 
     # 4. STEP 3: Quantum Encoding
     # Map the 3 selected features to 3 Qubits
