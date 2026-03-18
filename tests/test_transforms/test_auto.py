@@ -101,9 +101,9 @@ class TestAutoReducer:
         # Transform should apply projection first, then coreset
         X_reduced = ar.transform(X)
         
-        # Result should have at most 3 features and at most 50 samples
+        # Result should have at most 3 features
+        # CoresetReducer now maps to nearest center, preserving sample count
         assert X_reduced.shape[1] <= 3
-        assert X_reduced.shape[0] <= 50
         
     def test_auto_reducer_boundary_exactly_at_limits(self):
         """Test boundary case: data exactly at limits."""
