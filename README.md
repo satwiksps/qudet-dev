@@ -1,102 +1,233 @@
-# `QuDET`: Quantum Data Engineering Toolkit
+<p align="center">
+  <h1 align="center">⚛️ QuDET</h1>
+  <p align="center"><strong>Quantum Data Engineering Toolkit</strong></p>
+  <p align="center">
+    A modular Python framework for building hybrid classical–quantum data pipelines.
+  </p>
+</p>
 
-**QuDET** is an enterprise-grade Python library designed to bridge the gap between classical data engineering and quantum machine learning. It provides a robust, modular framework for building hybrid workflows, enabling researchers and engineers to integrate quantum algorithms into production pipelines without deep quantum physics expertise.
+<p align="center">
+  <a href="https://pypi.org/project/qudet/"><img src="https://img.shields.io/pypi/v/qudet?color=blue" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/qudet/"><img src="https://img.shields.io/pypi/pyversions/qudet" alt="Python versions"></a>
+  <a href="https://github.com/satwiksps/qudet-dev/blob/main/LICENSE"><img src="https://img.shields.io/github/license/satwiksps/qudet-dev" alt="License"></a>
+</p>
 
-## Table of Contents
+---
 
-- [Core Modules](#core-modules)
-  - [1. Connectors](#1-connectors)
-  - [2. Transforms](#2-transforms)
-  - [3. Encoders](#3-encoders)
-  - [4. Analytics](#4-analytics)
-  - [5. Compute](#5-compute)
-  - [6. Governance](#6-governance)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Contributing](#contributing)
-- [License](#license)
+## Overview
 
-## Core Modules
+**QuDET** bridges the gap between classical data engineering and quantum computing. It provides a production-ready, modular framework that lets AI engineers and researchers integrate quantum algorithms into data pipelines — without deep quantum physics expertise.
 
-QuDET is built around six specialized modules that handle every stage of the quantum data lifecycle, from ingestion to governance.
+QuDET follows scikit-learn conventions (`fit` / `transform` / `predict`) so you can drop quantum components into existing ML workflows with minimal friction.
 
-### 1. Connectors
-**The Bridge to Data Sources**
-This module handles the efficient ingestion of classical data into the quantum pipeline. It supports high-performance loading from modern data formats like Parquet and SQL databases, offering features tailored for large-scale data engineering such as streaming buffers and batch processing. It abstracts away the complexity of getting data ready for quantum conversion.
+## Why QuDET?
 
-### 2. Transforms
-**Pre-Quantum Feature Engineering**
-Before data can touch a quantum circuit, it must be rigorously prepared. The Transforms module provides quantum-aware feature engineering tools. This includes dimensionality reduction (critical for NISQ devices with limited qubits), feature scaling, and outlier detection. It ensures that the information fed into quantum states is dense, relevant, and normalized.
+- **Practical quantum integration** — Quantum components solve real problems (kernel methods, encoding, anomaly detection) rather than existing for novelty.
+- **Familiar API** — scikit-learn compatible interfaces mean minimal learning curve.
+- **Modular architecture** — Use only what you need. Each module works independently.
+- **Production-ready** — Input validation, proper error handling, logging, and type hints throughout.
+- **Simulator-first** — Works out of the box with Qiskit Aer. Optional IBM Quantum hardware support.
 
-### 3. Encoders
-**Classical-to-Quantum Conversion**
-This is the heart of the "Quantum Data" process. Encoders translate classical numerical data into quantum states. The module offers various strategies—like Amplitude Encoding for compression or Angle Encoding for noise resilience—allowing engineers to choose the best tradeoff between circuit depth and expressibility for their specific dataset.
+## Architecture
 
-### 4. Analytics
-**Quantum Machine Learning Models**
-The Analytics module contains the actual quantum algorithms used for insight generation. It provides familiar, Scikit-Learn compatible estimators for Classification (QSVC), Regression, and Clustering. These models leverage quantum kernels and variational circuits to find patterns in high-dimensional Hilbert spaces that classical models might miss.
+QuDET is organized into six specialized layers:
 
-### 5. Compute
-**Execution & Resource Management**
-Managing quantum hardware interactions is complex. The Compute layer abstracts this by handling backend connections (to simulators or real QPUs like IBM Quantum), circuit optimization, and distributed processing. It ensures that quantum jobs are executed efficiently, whether you are running a test on a laptop or a massive batch job on a cluster.
+```
+┌─────────────────────────────────────────────────────┐
+│                   GOVERNANCE                         │
+│   Drift Detection · Cost · Audit · Security · Privacy│
+├──────────┬───────────┬───────────┬──────────────────┤
+│CONNECTORS │ TRANSFORMS │  ENCODERS  │   ANALYTICS     │
+│CSV, SQL,  │PCA, Scale, │Angle, Amp, │ SVC, KMeans,    │
+│Parquet,   │Normalize,  │IQP, Phase, │ Regression,     │
+│Streaming  │Imputation  │Composite   │ Anomaly Det.    │
+├──────────┴───────────┴───────────┴──────────────────┤
+│                    COMPUTE                           │
+│   Backend Mgmt · Circuit Opt · Error Mitigation      │
+└─────────────────────────────────────────────────────┘
+```
 
-### 6. Governance
-**Safety, Cost, & Reliability**
-Unique to QuDET, this module addresses the operational challenges of "QuantumOps". It includes tools for:
-*   **Drift Detection:** Monitoring if the data distribution shifts using quantum kernels.
-*   **Cost Estimation:** Predicting the financial cost of running jobs on QPU providers.
-*   **Integrity Checks:** Verifying that data wasn't corrupted during the encoding process.
-*   **Audit Logging:** keeping a record of quantum job execution for compliance.
+| Module | Purpose | Key Classes |
+|--------|---------|-------------|
+| **Connectors** | Data ingestion & I/O | `QuantumDataLoader`, `QuantumParquetLoader`, `QuantumSQLLoader` |
+| **Transforms** | Feature engineering | `QuantumPCA`, `FeatureScaler`, `QuantumNormalizer`, `CoresetReducer` |
+| **Encoders** | Classical → Quantum | `AngleEncoder`, `AmplitudeEncoder`, `IQPEncoder`, `RotationEncoder` |
+| **Analytics** | Quantum ML models | `QuantumSVC`, `QuantumKernelRegressor`, `QuantumKMeans` |
+| **Compute** | Execution layer | `BackendManager`, `CircuitOptimizer`, `QuantumErrorMitigation` |
+| **Governance** | Safety & operations | `QuantumDriftDetector`, `ResourceEstimator`, `AuditLogger` |
 
 ## Installation
 
 ```bash
-git clone https://github.com/meow/quantum-data-engineering.git
-cd quantum-data-engineering
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+pip install qudet
+```
+
+### Optional Dependencies
+
+```bash
+# Parquet file support
+pip install "qudet[parquet]"
+
+# SQL database connectors
+pip install "qudet[sql]"
+
+# Encryption and security features
+pip install "qudet[crypto]"
+
+# Distributed computing with Dask
+pip install "qudet[distributed]"
+
+# Visualization (matplotlib, seaborn)
+pip install "qudet[visualization]"
+
+# IBM Quantum hardware access
+pip install "qudet[ibm]"
+
+# Everything (including dev tools)
+pip install "qudet[all]"
 ```
 
 ## Quick Start
 
-QuDET is designed to be intuitive. Here is a minimal example setting up a simple pipeline:
+### Quantum-Enhanced Classification Pipeline
 
 ```python
-from qudet.connectors import QuantumDataLoader
-from qudet.transforms import QuantumPCA
-from qudet.encoders import AngleEncoder
+from qudet.transforms import QuantumPCA, FeatureScaler
 from qudet.analytics import QuantumSVC
-from qudet.compute import BackendManager
-from qudet.governance import QuantumDriftDetector
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 
-# 1. Pipeline Definition
-# Load -> Check -> Reduce -> Encode -> Classify
-loader = QuantumDataLoader()
-drift_detector = QuantumDriftDetector()
-pca = QuantumPCA(n_components=4)
-encoder = AngleEncoder(n_qubits=4)
+# Load data
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
-# Get backend from Compute module
-backend = BackendManager.get_backend("simulator")
-classifier = QuantumSVC(n_qubits=4) # Uses simulator by default
+# Scale and reduce dimensions
+scaler = FeatureScaler(method="standard")
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# 2. Execution Flow
-data = loader.load_csv("data.csv")
+pca = QuantumPCA(n_components=3)
+X_train_reduced = pca.fit_transform(X_train_scaled)
+X_test_reduced = pca.transform(X_test_scaled)
 
-# Governance: Check for data drift before processing
-drift_detector.fit_reference(data) 
-
-reduced_data = pca.fit_transform(data)
-classifier.fit(reduced_data, labels)
-
-print("Pipeline executed successfully.")
+# Train quantum classifier
+clf = QuantumSVC(n_qubits=3, C=1.0)
+clf.fit(X_train_reduced, y_train)
+print(f"Accuracy: {clf.score(X_test_reduced, y_test):.2%}")
 ```
+
+### Quantum Encoding
+
+```python
+from qudet.encoders import AngleEncoder, AmplitudeEncoder, IQPEncoder
+import numpy as np
+
+data = np.array([0.1, 0.5, 0.3, 0.8])
+
+# Angle encoding — one rotation gate per feature
+encoder = AngleEncoder(n_qubits=4, angle_type="ry")
+circuit = encoder.encode(data)
+print(circuit.draw())
+
+# Amplitude encoding — logarithmic qubit compression
+amp_encoder = AmplitudeEncoder(n_qubits=2, normalize=True)
+circuit = amp_encoder.encode(data)
+
+# IQP encoding — with feature interactions
+iqp_encoder = IQPEncoder(n_qubits=4, reps=2)
+circuit = iqp_encoder.encode(data)
+```
+
+### Data Governance
+
+```python
+from qudet.governance import QuantumDriftDetector, ResourceEstimator
+from qiskit import QuantumCircuit
+
+# Monitor data drift
+detector = QuantumDriftDetector(n_qubits=4, threshold=0.1)
+detector.fit_reference(X_train)
+result = detector.detect_drift(X_test)
+print(f"Drift detected: {result['drift_detected']}")
+
+# Estimate circuit execution cost
+qc = QuantumCircuit(4)
+qc.h(range(4))
+cost = ResourceEstimator.estimate_circuit_cost(qc, shots=8192)
+print(f"Estimated cost: ${cost['total_cost']:.4f}")
+```
+
+## Development Setup
+
+```bash
+git clone https://github.com/satwiksps/qudet-dev.git
+cd qudet-dev
+python -m venv .venv
+
+# Linux/macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+pip install -e ".[dev]"
+```
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=qudet --cov-report=term-missing
+
+# Run specific module tests
+pytest tests/test_encoders/ -v
+
+# Run only fast tests
+pytest -m "not slow"
+```
+
+## Project Structure
+
+```
+qudet/
+├── core/               # Base classes and exceptions
+├── connectors/         # Data ingestion (CSV, Parquet, SQL, streaming)
+├── transforms/         # Feature engineering and dimensionality reduction
+├── encoders/           # Classical-to-quantum data encoding
+├── analytics/          # Quantum ML estimators
+├── compute/            # Backend management and circuit optimization
+├── governance/         # Monitoring, security, and operations
+└── datasets/           # Sample datasets
+```
+
+## Requirements
+
+- **Python** ≥ 3.10
+- **Qiskit** ≥ 1.0
+- **NumPy**, **Pandas**, **SciPy**, **scikit-learn**
+
+See [pyproject.toml](pyproject.toml) for the complete dependency specification.
 
 ## Contributing
 
-We welcome contributions! Please fork the repository, create a feature branch, and submit a pull request. Ensure all new code is covered by tests.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Write tests for your changes
+4. Ensure all tests pass (`pytest`)
+5. Format code (`black .` and `ruff check .`)
+6. Submit a pull request
 
 ## License
 
-Distributed under the Apache 2.0 License. See `LICENSE` for more information.
+Distributed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
+
+## Contact
+
+**Satwik Sai Prakash Sahoo** — [sahoospsatwik@gmail.com](mailto:sahoospsatwik@gmail.com)
+
+Project Link: [https://github.com/satwiksps/qudet-dev](https://github.com/satwiksps/qudet-dev)

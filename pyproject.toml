@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qudet"
+version = "1.0.0"
+description = "Quantum Data Engineering Toolkit — A modular Python framework for quantum-enhanced data pipelines."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Satwik Sai Prakash Sahoo", email = "sahoospsatwik@gmail.com"},
+]
+keywords = [
+    "quantum", "quantum-computing", "quantum-machine-learning",
+    "data-engineering", "qiskit", "mlops",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "numpy>=1.24,<3",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "qiskit>=1.0",
+    "qiskit-aer>=0.13",
+]
+
+[project.optional-dependencies]
+parquet = ["pyarrow>=14.0"]
+sql = ["sqlalchemy>=2.0"]
+crypto = ["cryptography>=41.0"]
+distributed = ["dask[distributed]>=2024.1"]
+visualization = ["matplotlib>=3.7", "seaborn>=0.13"]
+ibm = ["qiskit-ibm-runtime>=0.20"]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "black>=24.0",
+    "ruff>=0.3",
+    "build",
+    "twine",
+]
+all = ["qudet[parquet,sql,crypto,distributed,visualization,ibm,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/satwiksps/qudet-dev"
+Documentation = "https://github.com/satwiksps/qudet-dev#readme"
+Repository = "https://github.com/satwiksps/qudet-dev"
+Issues = "https://github.com/satwiksps/qudet-dev/issues"
+Changelog = "https://github.com/satwiksps/qudet-dev/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["qudet*"]
+
+[tool.setuptools.package-data]
+qudet = ["datasets/*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short -x"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks integration tests",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
