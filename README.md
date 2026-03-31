@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">⚛️ QuDET</h1>
+  <h1 align="center">QuDET</h1>
   <p align="center"><strong>Quantum Data Engineering Toolkit</strong></p>
   <p align="center">
     A modular Python framework for building hybrid classical–quantum data pipelines.
@@ -22,30 +22,16 @@ QuDET follows scikit-learn conventions (`fit` / `transform` / `predict`) so you 
 
 ## Why QuDET?
 
-- **Practical quantum integration** — Quantum components solve real problems (kernel methods, encoding, anomaly detection) rather than existing for novelty.
-- **Familiar API** — scikit-learn compatible interfaces mean minimal learning curve.
-- **Modular architecture** — Use only what you need. Each module works independently.
-- **Production-ready** — Input validation, proper error handling, logging, and type hints throughout.
-- **Simulator-first** — Works out of the box with Qiskit Aer. Optional IBM Quantum hardware support.
+- **Practical quantum integration:** Quantum components solve real problems (kernel methods, encoding, anomaly detection) rather than existing for novelty.
+- **Familiar API:** scikit-learn compatible interfaces mean minimal learning curve.
+- **Modular architecture:** Use only what you need. Each module works independently.
+- **Production-ready:** Input validation, proper error handling, logging, and type hints throughout.
+- **Simulator-first:** Works out of the box with Qiskit Aer. Optional IBM Quantum hardware support.
 
 ## Architecture
 
 QuDET is organized into six specialized layers:
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   GOVERNANCE                         │
-│   Drift Detection · Cost · Audit · Security · Privacy│
-├──────────┬───────────┬───────────┬──────────────────┤
-│CONNECTORS │ TRANSFORMS │  ENCODERS  │   ANALYTICS     │
-│CSV, SQL,  │PCA, Scale, │Angle, Amp, │ SVC, KMeans,    │
-│Parquet,   │Normalize,  │IQP, Phase, │ Regression,     │
-│Streaming  │Imputation  │Composite   │ Anomaly Det.    │
-├──────────┴───────────┴───────────┴──────────────────┤
-│                    COMPUTE                           │
-│   Backend Mgmt · Circuit Opt · Error Mitigation      │
-└─────────────────────────────────────────────────────┘
-```
 
 | Module | Purpose | Key Classes |
 |--------|---------|-------------|
@@ -189,28 +175,6 @@ pytest tests/test_encoders/ -v
 pytest -m "not slow"
 ```
 
-## Project Structure
-
-```
-qudet/
-├── core/               # Base classes and exceptions
-├── connectors/         # Data ingestion (CSV, Parquet, SQL, streaming)
-├── transforms/         # Feature engineering and dimensionality reduction
-├── encoders/           # Classical-to-quantum data encoding
-├── analytics/          # Quantum ML estimators
-├── compute/            # Backend management and circuit optimization
-├── governance/         # Monitoring, security, and operations
-└── datasets/           # Sample datasets
-```
-
-## Requirements
-
-- **Python** ≥ 3.10
-- **Qiskit** ≥ 1.0
-- **NumPy**, **Pandas**, **SciPy**, **scikit-learn**
-
-See [pyproject.toml](pyproject.toml) for the complete dependency specification.
-
 ## Contributing
 
 Contributions are welcome! Please:
@@ -225,9 +189,3 @@ Contributions are welcome! Please:
 ## License
 
 Distributed under the **Apache 2.0 License**. See [LICENSE](LICENSE) for details.
-
-## Contact
-
-**Satwik Sai Prakash Sahoo** — [sahoospsatwik@gmail.com](mailto:sahoospsatwik@gmail.com)
-
-Project Link: [https://github.com/satwiksps/qudet-dev](https://github.com/satwiksps/qudet-dev)
