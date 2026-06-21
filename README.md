@@ -14,6 +14,11 @@
 
 ---
 
+> **Acknowledgment:** QuDET was developed during the **IBM Qiskit Advocate Mentorship Program** (October 2025 - January 2026). 
+> 🏅 **[View Contributor Badge on Credly](https://www.credly.com/badges/64aed70f-a9ca-48b8-ae02-53a3a466b0c6/public_url)**
+
+---
+
 ## Overview
 
 **QuDET** bridges the gap between classical data engineering and quantum computing. It provides a production-ready, modular framework that lets AI engineers and researchers integrate quantum algorithms into data pipelines without deep quantum physics expertise.
